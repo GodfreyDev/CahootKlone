@@ -1,0 +1,255 @@
+{
+  "cs_history_milestones": {
+    "name": "CS History Milestones (10 Qs)",
+    "data": [
+      { "question": "Who is often called the 'first computer programmer' for their notes on Babbage's Analytical Engine?", "options": ["Charles Babbage", "Ada Lovelace", "Alan Turing", "Grace Hopper"], "correctAnswer": 1 },
+      { "question": "Which WWII codebreaking machine is considered one of the first electronic digital computers?", "options": ["ENIAC", "Colossus", "UNIVAC", "MARK I"], "correctAnswer": 1 },
+      { "question": "Grace Hopper popularized 'debugging' after removing what from a relay?", "options": ["Dust Bunny", "Spider", "Moth", "Ant"], "correctAnswer": 2 },
+      { "question": "The concept of the stored-program computer architecture is largely attributed to:", "options": ["Alan Turing", "John von Neumann", "Konrad Zuse", "Howard Aiken"], "correctAnswer": 1 },
+      { "question": "What company introduced the first commercially successful microprocessor, the Intel 4004?", "options": ["AMD", "Motorola", "IBM", "Intel"], "correctAnswer": 3 },
+      { "question": "What does the 'Turing Test' propose to measure?", "options": ["Processing speed", "A machine's human-like intelligence", "Memory capacity", "Network latency"], "correctAnswer": 1 },
+      { "question": "The ARPANET, a precursor to the modern internet, was primarily funded by which US organization?", "options": ["NASA", "NSF (National Science Foundation)", "DOE (Dept. of Energy)", "DARPA (Defense Advanced Research Projects Agency)"], "correctAnswer": 3 },
+      { "question": "Which operating system, developed at Bell Labs in the 1970s, heavily influenced Linux and macOS?", "options": ["Windows", "Multics", "Unix", "CP/M"], "correctAnswer": 2 },
+      { "question": "What graphical user interface (GUI) element was popularized by Xerox PARC and later adopted by Apple and Microsoft?", "options": ["Command Line", "Desktop Metaphor (icons/windows)", "Punch Cards", "Text Editor"], "correctAnswer": 1 },
+      { "question": "What does 'Open Source' signify about software?", "options": ["It's always free of charge", "Its source code is publicly accessible", "It's developed by a single person", "It has no bugs"], "correctAnswer": 1 }
+    ]
+  },
+  "data_structures_core": {
+    "name": "Core Data Structures (10 Qs)",
+    "data": [
+      { "question": "Which structure guarantees O(1) access time given an index?", "options": ["Linked List", "Stack", "Array", "Hash Table"], "correctAnswer": 2 },
+      { "question": "Which structure enforces a LIFO (Last-In, First-Out) access pattern?", "options": ["Queue", "Stack", "Heap", "Graph"], "correctAnswer": 1 },
+      { "question": "Which structure enforces a FIFO (First-In, First-Out) access pattern?", "options": ["Stack", "Queue", "Tree", "Set"], "correctAnswer": 1 },
+      { "question": "What is the primary advantage of a Linked List over an Array for insertions/deletions?", "options": ["Faster access by index", "Less memory usage", "No need to shift elements", "Easier sorting"], "correctAnswer": 2 },
+      { "question": "What property must keys typically have for effective use in a Hash Table?", "options": ["Be integers", "Be unique", "Be comparable", "Be hashable (consistently produce a hash code)"], "correctAnswer": 3 },
+      { "question": "A Binary Search Tree requires elements to be:", "options": ["Unique", "Integers only", "Comparable (ordered)", "Stored in an array"], "correctAnswer": 2 },
+      { "question": "Which data structure efficiently represents hierarchical relationships?", "options": ["Queue", "Stack", "Tree", "Graph"], "correctAnswer": 2 },
+      { "question": "What structure connects nodes (vertices) with edges, allowing for many-to-many relationships?", "options": ["List", "Array", "Tree", "Graph"], "correctAnswer": 3 },
+      { "question": "A Heap is commonly used to efficiently implement which abstract data type?", "options": ["Set", "Stack", "Priority Queue", "Map"], "correctAnswer": 2 },
+      { "question": "Which structure provides average O(log n) insertion, deletion, and search?", "options": ["Unsorted Array", "Sorted Array", "Balanced Binary Search Tree", "Stack"], "correctAnswer": 2 }
+    ]
+  },
+  "algorithms_foundations": {
+    "name": "Algorithm Foundations (10 Qs)",
+    "data": [
+      { "question": "Which searching algorithm requires the data to be sorted first?", "options": ["Linear Search", "Binary Search", "Depth-First Search", "Breadth-First Search"], "correctAnswer": 1 },
+      { "question": "What is the time complexity of Binary Search on a sorted array?", "options": ["O(1)", "O(log n)", "O(n)", "O(n log n)"], "correctAnswer": 1 },
+      { "question": "Which sorting algorithm has an average and worst-case time complexity of O(n log n)?", "options": ["Bubble Sort", "Insertion Sort", "Selection Sort", "Merge Sort"], "correctAnswer": 3 },
+      { "question": "Which sorting algorithm works by repeatedly finding the minimum element and putting it in place?", "options": ["Bubble Sort", "Insertion Sort", "Selection Sort", "Quick Sort"], "correctAnswer": 2 },
+      { "question": "What does the 'Big O' notation describe?", "options": ["Exact execution time", "Memory usage", "Algorithm correctness", "Asymptotic upper bound on growth rate"], "correctAnswer": 3 },
+      { "question": "A 'Divide and Conquer' algorithm typically involves which steps?", "options": ["Iterate, Compare, Swap", "Break down, Solve subproblems, Combine", "Greedy choice, Update, Repeat", "Initialize, Loop, Finalize"], "correctAnswer": 1 },
+      { "question": "What is recursion in programming?", "options": ["Using loops", "A function calling itself", "Handling errors", "Sorting data"], "correctAnswer": 1 },
+      { "question": "Which graph traversal explores as far as possible along each branch before backtracking?", "options": ["Breadth-First Search (BFS)", "Depth-First Search (DFS)", "Dijkstra's Algorithm", "A* Search"], "correctAnswer": 1 },
+      { "question": "Which graph traversal explores neighbors level by level?", "options": ["Breadth-First Search (BFS)", "Depth-First Search (DFS)", "Prim's Algorithm", "Kruskal's Algorithm"], "correctAnswer": 0 },
+      { "question": "Dijkstra's algorithm is used to find:", "options": ["All connected components", "Minimum spanning tree", "Shortest path in a weighted graph (no negative weights)", "Longest path in a DAG"], "correctAnswer": 2 }
+    ]
+  },
+  "web_dev_essentials": {
+    "name": "Web Dev Essentials (10 Qs)",
+    "data": [
+      { "question": "What is the primary role of HTML?", "options": ["Styling", "Interactivity", "Structure & Content", "Server Logic"], "correctAnswer": 2 },
+      { "question": "What is the primary role of CSS?", "options": ["Structure", "Database", "Styling & Layout", "Client-side Scripting"], "correctAnswer": 2 },
+      { "question": "What language adds interactivity and dynamic behavior to web pages?", "options": ["HTML", "CSS", "SQL", "JavaScript"], "correctAnswer": 3 },
+      { "question": "What does HTTP stand for?", "options": ["HyperText Transfer Protocol", "Hyperlink Text Translation Program", "High Tech Transport Protocol", "Hyper Transfer Text Process"], "correctAnswer": 0 },
+      { "question": "Which HTTP method is typically used for submitting form data?", "options": ["GET", "POST", "PUT", "DELETE"], "correctAnswer": 1 },
+      { "question": "What does the 'Cascading' in CSS refer to?", "options": ["Falling animations", "Rules for resolving conflicting styles", "Water-based design", "Server requests"], "correctAnswer": 1 },
+      { "question": "What is the DOM (Document Object Model)?", "options": ["A styling language", "A server type", "A programming interface for HTML documents", "A database model"], "correctAnswer": 2 },
+      { "question": "What is the purpose of the `alt` attribute on an `<img>` tag?", "options": ["Alternative text for accessibility/if image fails", "Image alignment", "Image source URL", "Image caption"], "correctAnswer": 0 },
+      { "question": "Which is NOT a standard JavaScript data type?", "options": ["String", "Number", "Boolean", "Integer (distinct type)"], "correctAnswer": 3 },
+      { "question": "What technology allows web pages to update content asynchronously without a full page reload?", "options": ["HTML", "CSS", "AJAX (Asynchronous JavaScript and XML)", "SQL"], "correctAnswer": 2 }
+    ]
+  },
+  "programming_paradigms": {
+    "name": "Programming Paradigms (8 Qs)",
+    "data": [
+      { "question": "Which paradigm focuses on objects that bundle data and methods?", "options": ["Procedural", "Functional", "Object-Oriented (OOP)", "Logical"], "correctAnswer": 2 },
+      { "question": "Which paradigm emphasizes functions as first-class citizens and avoids side effects?", "options": ["Imperative", "Object-Oriented", "Functional", "Event-Driven"], "correctAnswer": 2 },
+      { "question": "Languages like C, Pascal, and early FORTRAN primarily follow which paradigm?", "options": ["Object-Oriented", "Functional", "Logical", "Procedural/Imperative"], "correctAnswer": 3 },
+      { "question": "Encapsulation, Inheritance, and Polymorphism are key concepts in which paradigm?", "options": ["Functional", "Procedural", "Object-Oriented (OOP)", "Declarative"], "correctAnswer": 2 },
+      { "question": "Which paradigm often involves immutable data structures?", "options": ["Imperative", "Object-Oriented", "Functional", "Scripting"], "correctAnswer": 2 },
+      { "question": "Event handling (like button clicks in UI) is central to which paradigm?", "options": ["Logical", "Functional", "Event-Driven", "Procedural"], "correctAnswer": 2 },
+      { "question": "SQL (Structured Query Language) is primarily an example of which paradigm?", "options": ["Imperative", "Object-Oriented", "Functional", "Declarative"], "correctAnswer": 3 },
+      { "question": "Which paradigm focuses on expressing logic via facts and rules (e.g., Prolog)?", "options": ["Procedural", "Object-Oriented", "Logical", "Functional"], "correctAnswer": 2 }
+    ]
+  },
+  "internet_meme_history": {
+    "name": "Internet Meme History (10 Qs)",
+    "data": [
+      { "question": "The 'Distracted Boyfriend' meme originated from what source?", "options": ["A movie scene", "A viral video", "A stock photograph", "A webcomic"], "correctAnswer": 2 },
+      { "question": "'This is Fine' dog meme typically conveys a sense of:", "options": ["Extreme anger", "Calm acceptance amidst chaos", "Joyful celebration", "Deep sadness"], "correctAnswer": 1 },
+      { "question": "The 'Doge' meme features which breed of dog?", "options": ["Golden Retriever", "Shiba Inu", "Pomeranian", "Corgi"], "correctAnswer": 1 },
+      { "question": "'Rickrolling' involves unexpectedly showing someone the music video for which Rick Astley song?", "options": ["'Together Forever'", "'Never Gonna Give You Up'", "'Cry for Help'", "'Whenever You Need Somebody'"], "correctAnswer": 1 },
+      { "question": "The 'One Does Not Simply Walk into Mordor' meme features which character?", "options": ["Gandalf", "Aragorn", "Legolas", "Boromir"], "correctAnswer": 3 },
+      { "question": "The 'Success Kid' meme features a baby doing what?", "options": ["Crying", "Clenching a fist", "Laughing", "Pointing"], "correctAnswer": 1 },
+      { "question": "The 'Surprised Pikachu' meme is used to express:", "options": ["Genuine shock at an unexpected outcome", "Feigned shock at an obvious outcome", "Excitement", "Confusion"], "correctAnswer": 1 },
+      { "question": "Where did the 'Drake Meme' (Drake looking displeased, then pleased) originate?", "options": ["A movie trailer", "A TV show appearance", "The 'Hotline Bling' music video", "A concert photo"], "correctAnswer": 2 },
+      { "question": "Grumpy Cat's real name was:", "options": ["Snowball", "Fluffy", "Tardar Sauce", "Chairman Meow"], "correctAnswer": 2 },
+      { "question": "The 'Woman Yelling at a Cat' meme combines a reality TV still with a picture of which white cat?", "options": ["Lil Bub", "Nyan Cat", "Smudge Lord", "Keyboard Cat"], "correctAnswer": 2 }
+    ]
+  },
+   "geek_culture_medley": {
+    "name": "Geek Culture Medley (10 Qs)",
+    "data": [
+      { "question": "Han Solo's ship in 'Star Wars'?", "options": ["Star Destroyer", "X-Wing", "Millennium Falcon", "TIE Fighter"], "correctAnswer": 2 },
+      { "question": "What does 'TARDIS' stand for?", "options": ["Time And Relative Dimension In Space", "Totally Awesome Reliable Device In Space", "Time And Rate Detector In System", "Temporal And Relativistic Dimensional Interstellar Ship"], "correctAnswer": 0 },
+      { "question": "Harry Potter's Hogwarts house?", "options": ["Slytherin", "Hufflepuff", "Ravenclaw", "Gryffindor"], "correctAnswer": 3 },
+      { "question": "Primary goal in 'Minecraft'?", "options": ["Defeat Ender Dragon", "Build house", "Survive", "No single primary goal"], "correctAnswer": 3 },
+      { "question": "Primary creator/co-creator of Iron Man, Spider-Man etc.?", "options": ["Jack Kirby", "Steve Ditko", "Stan Lee", "All have credits"], "correctAnswer": 2 },
+      { "question": "Fictional substance powering lightsabers?", "options": ["Dilithium Crystals", "Vibranium", "Kyber Crystals", "Unobtanium"], "correctAnswer": 2 },
+      { "question": "Original bearer of the One Ring after Sauron?", "options": ["Frodo", "Bilbo", "Gollum", "Isildur"], "correctAnswer": 3 },
+      { "question": "Term for fan-created stories based on existing works?", "options": ["Headcanon", "Fan Fiction", "Spin-off", "Adaptation"], "correctAnswer": 1 },
+      { "question": "Which language is jokingly called 'write-only'?", "options": ["Python", "Perl", "Java", "BASIC"], "correctAnswer": 1 },
+      { "question": "What does 'Ctrl+Alt+Del' typically open on Windows?", "options": ["Log off screen", "Task Manager/Security Options", "Restart prompt", "Recycle Bin"], "correctAnswer": 1 }
+    ]
+  },
+    "spongebob_iconic": {
+    "name": "SpongeBob Iconic Moments (10 Qs)",
+    "data": [
+      { "question": "In 'Band Geeks', Patrick asks Squidward if mayonnaise is an instrument. Squidward's immediate reply is:", "options": ["'Yes, Patrick.'", "'No, Patrick, mayonnaise is not an instrument.'", "'Horseradish isn't an instrument either.'", "'Just play louder!'"], "correctAnswer": 1 },
+      { "question": "Finish the Krusty Krab pizza delivery song: 'The Krusty Krab pizza is the pizza for you and...'?", "options": ["ME!", "THREE!", "THE SEA!", "DEE!"], "correctAnswer": 0 },
+      { "question": "What word does SpongeBob repeatedly write when creating DoodleBob?", "options": ["Me Hoy Minoy!", "Finland!", "Life!", "Evil!"], "correctAnswer": 0 },
+      { "question": "What object does SpongeBob fall in love with in 'Bubble Buddy'?", "options": ["A Krabby Patty", "A sentient Bubble", "A spatula", "A treasure chest"], "correctAnswer": 1 },
+      { "question": "Patrick Star's famous quote about 'Wumbology' states: 'It's ______ grade, SpongeBob!'", "options": ["Kindergarten", "Pre-school", "First", "College"], "correctAnswer": 2 },
+      { "question": "What injury does Fred the Fish famously and frequently exclaim about?", "options": ["MY ARM!", "MY FIN!", "MY LEG!", "MY EYE!"], "correctAnswer": 2 },
+      { "question": "In 'Sailor Mouth', SpongeBob and Patrick learn 'sentence enhancers' from where?", "options": ["Mr. Krabs", "A dumpster", "Mermaid Man", "Larry the Lobster"], "correctAnswer": 1 },
+      { "question": "What does Squidward's sculpture 'Bold and Brash' more closely resemble?", "options": ["Himself", "SpongeBob", "Mr. Krabs", "Something thrown in the trash"], "correctAnswer": 3 },
+      { "question": "How does SpongeBob achieve 'Anchor Arms' in 'MuscleBob BuffPants'?", "options": ["Working out", "Kelp injections", "Inflatable arms", "Magic"], "correctAnswer": 2 },
+      { "question": "What club requires members to eat a bowl of nails for breakfast (without any milk)?", "options": ["The Krusty Krew", "The Salty Spitoon", "The Chum Bucket Crew", "Weenie Hut Jr's"], "correctAnswer": 1 }
+    ]
+  },
+  "ethics_in_computing": {
+    "name": "Ethics in Computing (10 Qs)",
+    "data": [
+      { "question": "The Therac-25 incidents were primarily failures in:", "options": ["Network security", "Hardware", "Software testing & safety", "Encryption"], "correctAnswer": 2 },
+      { "question": "Algorithmic bias often results from:", "options": ["Malicious code", "Hardware failures", "Biased data / flawed design", "Slow CPUs"], "correctAnswer": 2 },
+      { "question": "'Dark patterns' in UI are designed to:", "options": ["Improve access", "Enhance security", "Trick users", "Optimize speed"], "correctAnswer": 2 },
+      { "question": "GDPR's 'Right to Erasure' is also known as Right to be:", "options": ["Ported", "Rectified", "Forgotten", "Accessed"], "correctAnswer": 2 },
+      { "question": "The 'digital divide' refers to the gap in access to:", "options": ["Software versions", "Technology/Internet", "CPU architectures", "Paradigms"], "correctAnswer": 1 },
+      { "question": "Which code emphasizes prioritizing public safety/welfare?", "options": ["Agile", "ACM/IEEE Code", "Creative Commons", "Hacker Ethic"], "correctAnswer": 1 },
+      { "question": "'Planned obsolescence' raises ethical concerns mainly about:", "options": ["Licensing", "Environmental waste", "Net neutrality", "Transparency"], "correctAnswer": 1 },
+      { "question": "Knowingly shipping insecure code violates:", "options": ["Beneficence", "Non-maleficence", "Justice", "Autonomy"], "correctAnswer": 1 },
+      { "question": "Legal concept: creators responsible for software damages?", "options": ["OSI", "Software Liability", "Fair Use", "DMCA"], "correctAnswer": 1 },
+      { "question": "Challenge when AI decision-making is incomprehensible?", "options": ["Vendor lock-in", "Black Box Problem", "Scope creep", "Technical debt"], "correctAnswer": 1 }
+    ]
+  },
+  "operating_systems_basics": {
+    "name": "OS Concepts Fundamentals (10 Qs)",
+    "data": [
+      { "question": "What is the core component of an OS that manages hardware and software resources?", "options": ["Shell", "Kernel", "API", "File System"], "correctAnswer": 1 },
+      { "question": "What is the primary difference between a process and a thread?", "options": ["Processes are faster", "Threads share the same address space", "Only processes can use CPU", "Threads cannot communicate"], "correctAnswer": 1 },
+      { "question": "What technique allows the OS to use disk space as an extension of RAM?", "options": ["Caching", "Buffering", "Virtual Memory", "Pipelining"], "correctAnswer": 2 },
+      { "question": "Which scheduling policy aims to give each process a fair share of CPU time, often using time slices?", "options": ["First-Come, First-Served (FCFS)", "Shortest Job First (SJF)", "Priority Scheduling", "Round Robin"], "correctAnswer": 3 },
+      { "question": "What is a 'deadlock' in operating systems?", "options": ["A process crashing", "A security breach", "Two or more processes waiting indefinitely for each other", "A memory leak"], "correctAnswer": 2 },
+      { "question": "What is the role of the Memory Management Unit (MMU)?", "options": ["Manage mouse input", "Translate virtual addresses to physical addresses", "Control network traffic", "Handle disk I/O"], "correctAnswer": 1 },
+      { "question": "What does 'context switching' involve?", "options": ["Changing the user interface theme", "Switching between different applications manually", "Saving the state of one process and loading the state of another", "Updating the operating system"], "correctAnswer": 2 },
+      { "question": "What is the primary purpose of a file system?", "options": ["To execute programs", "To manage network connections", "To organize, store, and retrieve files on storage devices", "To manage CPU allocation"], "correctAnswer": 2 },
+      { "question": "What is a 'system call'?", "options": ["A hardware interrupt", "A way for user programs to request services from the OS kernel", "A function call within the same program", "A network request to another computer"], "correctAnswer": 1 },
+      { "question": "What type of scheduling allows the OS to forcibly interrupt a running process to run another?", "options": ["Non-preemptive", "Cooperative", "Preemptive", "Batch"], "correctAnswer": 2 }
+    ]
+  },
+  "networking_basics": {
+    "name": "Networking Basics (10 Qs)",
+    "data": [
+      { "question": "What does 'IP' stand for in TCP/IP?", "options": ["Internal Protocol", "Internet Protocol", "Information Packet", "Interface Program"], "correctAnswer": 1 },
+      { "question": "Which layer of the OSI model is responsible for routing packets across networks?", "options": ["Physical Layer", "Data Link Layer", "Network Layer", "Transport Layer"], "correctAnswer": 2 },
+      { "question": "What is the primary function of DNS (Domain Name System)?", "options": ["Encrypt network traffic", "Assign IP addresses automatically", "Translate domain names to IP addresses", "Route packets"], "correctAnswer": 2 },
+      { "question": "Which protocol guarantees reliable, ordered delivery of data?", "options": ["UDP (User Datagram Protocol)", "TCP (Transmission Control Protocol)", "IP (Internet Protocol)", "ICMP (Internet Control Message Protocol)"], "correctAnswer": 1 },
+      { "question": "What is a MAC (Media Access Control) address used for?", "options": ["Identifying networks globally", "Identifying network interfaces locally (on the same network segment)", "User authentication", "Website addresses"], "correctAnswer": 1 },
+      { "question": "Which device connects different networks together and makes routing decisions?", "options": ["Hub", "Switch", "Router", "Repeater"], "correctAnswer": 2 },
+      { "question": "What is the standard port number for HTTP?", "options": ["21", "25", "80", "443"], "correctAnswer": 2 },
+      { "question": "What is the standard port number for HTTPS?", "options": ["80", "110", "143", "443"], "correctAnswer": 3 },
+      { "question": "What does DHCP (Dynamic Host Configuration Protocol) typically assign to devices?", "options": ["MAC Addresses", "Domain Names", "SSL Certificates", "IP Addresses and network configuration"], "correctAnswer": 3 },
+      { "question": "What is a 'subnet mask' used for?", "options": ["Hiding a network", "Determining which part of an IP address is the network ID and which is the host ID", "Encrypting data", "Filtering website access"], "correctAnswer": 1 }
+    ]
+  },
+  "cybersecurity_fundamentals": {
+    "name": "Cybersecurity Fundamentals (10 Qs)",
+    "data": [
+      { "question": "What type of attack involves tricking users into revealing sensitive information?", "options": ["DDoS", "Phishing", "Malware", "SQL Injection"], "correctAnswer": 1 },
+      { "question": "What is the purpose of a firewall?", "options": ["Encrypt files", "Monitor and control incoming/outgoing network traffic", "Detect viruses", "Speed up internet connection"], "correctAnswer": 1 },
+      { "question": "Which term describes software designed to harm or disrupt computer systems?", "options": ["Firmware", "Adware", "Malware", "Middleware"], "correctAnswer": 2 },
+      { "question": "What does 'HTTPS' add compared to 'HTTP'?", "options": ["Faster speed", "More reliable connections", "Encryption (Security)", "Better caching"], "correctAnswer": 2 },
+      { "question": "Two-Factor Authentication (2FA) typically requires something you know and something you...?", "options": ["Forget", "Share", "Have", "Guess"], "correctAnswer": 2 },
+      { "question": "What is a 'Distributed Denial of Service' (DDoS) attack?", "options": ["Stealing data", "Overwhelming a server with traffic from many sources", "Installing ransomware", "Guessing passwords"], "correctAnswer": 1 },
+      { "question": "Which cryptographic technique uses two related keys (public and private)?", "options": ["Symmetric Encryption", "Hashing", "Asymmetric Encryption (Public-Key Cryptography)", "Steganography"], "correctAnswer": 2 },
+      { "question": "What vulnerability involves inserting malicious code into database queries?", "options": ["Cross-Site Scripting (XSS)", "SQL Injection", "Buffer Overflow", "Man-in-the-Middle"], "correctAnswer": 1 },
+      { "question": "What is 'social engineering' in a security context?", "options": ["Designing secure systems", "Manipulating people to bypass security controls", "Collaborative software development", "Network configuration"], "correctAnswer": 1 },
+      { "question": "Regularly updating software is important primarily to:", "options": ["Get new features", "Patch security vulnerabilities", "Improve user interface", "Reduce disk usage"], "correctAnswer": 1 }
+    ]
+  },
+   "database_concepts_sql": {
+    "name": "Database Concepts (SQL Focus) (10 Qs)",
+    "data": [
+      { "question": "What does SQL stand for?", "options": ["Structured Query Language", "Simple Query Logic", "Standard Question Language", "System Query Library"], "correctAnswer": 0 },
+      { "question": "Which SQL keyword is used to retrieve data from a database?", "options": ["GET", "FETCH", "SELECT", "RETRIEVE"], "correctAnswer": 2 },
+      { "question": "In a relational database, data is organized into:", "options": ["Documents", "Graphs", "Tables (Rows and Columns)", "Key-Value Pairs"], "correctAnswer": 2 },
+      { "question": "Which SQL clause filters records based on specified conditions?", "options": ["FROM", "ORDER BY", "GROUP BY", "WHERE"], "correctAnswer": 3 },
+      { "question": "What uniquely identifies each row in a relational database table?", "options": ["Foreign Key", "Index", "Primary Key", "Column Name"], "correctAnswer": 2 },
+      { "question": "Which SQL statement is used to add new rows to a table?", "options": ["ADD ROW", "INSERT INTO", "CREATE RECORD", "NEW DATA"], "correctAnswer": 1 },
+      { "question": "Which SQL statement modifies existing data in a table?", "options": ["MODIFY", "CHANGE", "UPDATE", "ALTER"], "correctAnswer": 2 },
+      { "question": "The `JOIN` clause in SQL is used to:", "options": ["Combine rows from two or more tables based on a related column", "Sort the results", "Delete tables", "Create new databases"], "correctAnswer": 0 },
+      { "question": "What does 'Normalization' in database design aim to reduce?", "options": ["Query speed", "Data redundancy and improve data integrity", "Number of tables", "Storage capacity"], "correctAnswer": 1 },
+      { "question": "Which SQL aggregate function calculates the total number of rows matching a condition?", "options": ["SUM()", "AVG()", "MAX()", "COUNT()"], "correctAnswer": 3 }
+    ]
+  },
+  "git_version_control": {
+    "name": "Git & Version Control Basics (10 Qs)",
+    "data": [
+      { "question": "What is the primary purpose of a version control system like Git?", "options": ["To write code faster", "To track changes to files over time", "To debug code automatically", "To deploy applications"], "correctAnswer": 1 },
+      { "question": "What command initializes a new Git repository in the current directory?", "options": ["git start", "git new", "git init", "git create"], "correctAnswer": 2 },
+      { "question": "What does `git clone` do?", "options": ["Creates a new branch", "Copies a remote repository to your local machine", "Stages changes", "Commits changes"], "correctAnswer": 1 },
+      { "question": "Which command stages changes for the next commit?", "options": ["git commit", "git push", "git add", "git status"], "correctAnswer": 2 },
+      { "question": "Which command records the staged changes into the repository history?", "options": ["git log", "git pull", "git stage", "git commit"], "correctAnswer": 3 },
+      { "question": "What is a 'branch' in Git used for?", "options": ["Storing old versions", "Deleting files", "Developing features in isolation without affecting the main codebase", "Connecting to remote repositories"], "correctAnswer": 2 },
+      { "question": "What command switches between branches?", "options": ["git switch", "git checkout", "git branch -m", "Both A and B can work"], "correctAnswer": 3 },
+      { "question": "What does `git pull` typically do?", "options": ["Uploads local changes to the remote", "Fetches changes from a remote repository and merges them into the current branch", "Shows the commit history", "Deletes a branch"], "correctAnswer": 1 },
+      { "question": "What command uploads local commits to a remote repository?", "options": ["git fetch", "git upload", "git push", "git remote add"], "correctAnswer": 2 },
+      { "question": "What is a 'merge conflict'?", "options": ["A bug in Git", "When Git cannot automatically combine changes from different commits/branches", "An error during `git clone`", "Two people trying to push at the same time"], "correctAnswer": 1 }
+    ]
+  },
+  "sci_fi_classics_lit_film": {
+    "name": "Sci-Fi Classics (Lit & Film) (10 Qs)",
+    "data": [
+      { "question": "Who wrote 'Foundation', a seminal series about predicting the future using 'psychohistory'?", "options": ["Arthur C. Clarke", "Robert Heinlein", "Isaac Asimov", "Philip K. Dick"], "correctAnswer": 2 },
+      { "question": "In 'Dune', what valuable resource is found only on the planet Arrakis?", "options": ["Dilithium Crystals", "Spice Melange", "Vibranium", "Unobtanium"], "correctAnswer": 1 },
+      { "question": "Which film, directed by Stanley Kubrick, features the enigmatic HAL 9000 computer?", "options": ["Blade Runner", "Alien", "2001: A Space Odyssey", "Terminator"], "correctAnswer": 2 },
+      { "question": "What are the 'Three Laws of Robotics' most famously associated with?", "options": ["Isaac Asimov", "George Orwell", "H.G. Wells", "Jules Verne"], "correctAnswer": 0 },
+      { "question": "Which dystopian novel features 'Big Brother' and the 'Thought Police'?", "options": ["Brave New World", "Fahrenheit 451", "Nineteen Eighty-Four", "A Clockwork Orange"], "correctAnswer": 2 },
+      { "question": "The film 'Blade Runner' is loosely based on which Philip K. Dick novel?", "options": ["Ubik", "A Scanner Darkly", "The Man in the High Castle", "Do Androids Dream of Electric Sheep?"], "correctAnswer": 3 },
+      { "question": "H.G. Wells wrote which classic novel about a Martian invasion?", "options": ["The Time Machine", "The Invisible Man", "The War of the Worlds", "The Island of Doctor Moreau"], "correctAnswer": 2 },
+      { "question": "In 'The Hitchhiker's Guide to the Galaxy', what is the 'Answer to the Ultimate Question of Life, the Universe, and Everything'?", "options": ["Love", "42", "Knowledge", "A Towel"], "correctAnswer": 1 },
+      { "question": "Which author wrote 'Neuromancer', a foundational work of the cyberpunk genre?", "options": ["Neal Stephenson", "William Gibson", "Bruce Sterling", "Richard K. Morgan"], "correctAnswer": 1 },
+      { "question": "The 'Prime Directive' is a guiding principle in which sci-fi franchise?", "options": ["Star Wars", "Battlestar Galactica", "Doctor Who", "Star Trek"], "correctAnswer": 3 }
+    ]
+  },
+   "python_basics": {
+    "name": "Python Basics (10 Qs)",
+    "data": [
+      { "question": "How do you print 'Hello, World!' to the console in Python?", "options": ["console.log('Hello, World!')", "System.out.println('Hello, World!')", "print('Hello, World!')", "echo 'Hello, World!'"], "correctAnswer": 2 },
+      { "question": "What symbol is used for single-line comments in Python?", "options": ["//", "/* */", "#", "--"], "correctAnswer": 2 },
+      { "question": "Which data type is used to store a sequence of characters?", "options": ["int", "float", "bool", "str"], "correctAnswer": 3 },
+      { "question": "How is indentation used in Python?", "options": ["For comments only", "To define blocks of code (like loops and functions)", "It's optional", "To separate arguments"], "correctAnswer": 1 },
+      { "question": "Which keyword is used to define a function in Python?", "options": ["function", "define", "fun", "def"], "correctAnswer": 3 },
+      { "question": "What is the result of `3 * 'A'` in Python?", "options": ["Error", "3A", "'AAA'", "A3"], "correctAnswer": 2 },
+      { "question": "Which collection type is ordered, mutable (changeable), and allows duplicate elements?", "options": ["tuple", "set", "dict", "list"], "correctAnswer": 3 },
+      { "question": "Which collection type is unordered and does not allow duplicate elements?", "options": ["list", "tuple", "set", "dict"], "correctAnswer": 2 },
+      { "question": "How do you get the number of items in a list called `my_list`?", "options": ["my_list.count()", "size(my_list)", "len(my_list)", "my_list.length"], "correctAnswer": 2 },
+      { "question": "Which statement is used to make decisions based on a condition?", "options": ["for", "while", "if/elif/else", "try/except"], "correctAnswer": 2 }
+    ]
+  },
+   "linux_cli_basics": {
+    "name": "Linux Command Line Basics (10 Qs)",
+    "data": [
+      { "question": "Which command lists files and directories in the current location?", "options": ["list", "dir", "ls", "show"], "correctAnswer": 2 },
+      { "question": "Which command changes the current directory?", "options": ["cd", "chd", "chdir", "goto"], "correctAnswer": 0 },
+      { "question": "Which command prints the current working directory path?", "options": ["path", "pwd", "whereami", "cwd"], "correctAnswer": 1 },
+      { "question": "Which command creates a new directory?", "options": ["crdir", "newdir", "mkdir", "makedir"], "correctAnswer": 2 },
+      { "question": "Which command is used to copy files or directories?", "options": ["copy", "cp", "cpy", "duplicate"], "correctAnswer": 1 },
+      { "question": "Which command is used to move or rename files or directories?", "options": ["move", "ren", "mv", "shift"], "correctAnswer": 2 },
+      { "question": "Which command removes (deletes) files?", "options": ["del", "erase", "rm", "remove"], "correctAnswer": 2 },
+      { "question": "Which command removes empty directories?", "options": ["rmdir", "deldir", "rm -d", "removedir"], "correctAnswer": 0 },
+      { "question": "Which command displays the contents of a text file on the screen?", "options": ["display", "show", "type", "cat"], "correctAnswer": 3 },
+      { "question": "What does the `sudo` command typically do?", "options": ["Search for files", "Run a command with superuser (administrator) privileges", "Stop a running process", "Shutdown the system"], "correctAnswer": 1 }
+    ]
+  }
+}

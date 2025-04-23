@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Cahoot Klone</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Favicon -->
+    <link rel="icon" href="https://cdn.glitch.global/9b03ef31-3692-4d55-a8ae-4315c13f33df/favicon4.png?v=1744606255144" type="image/png">
+
+    <!-- Link to External CSS -->
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+    <div id="main-container">
+        <div id="status">Connecting...</div>
+
+        <!-- Initial Screen -->
+        <div id="initial-screen">
+             <h1>Welcome to Cahoot Klone!</h1>
+             <div>
+                 <button id="create-game-btn">Create Game (Host)</button>
+                 <hr />
+                 <form id="join-form">
+                     <label for="nickname-input">Enter Nickname:</label><br>
+                     <input type="text" id="nickname-input" placeholder="Your Name" autocomplete="off" required maxlength="20" /><br>
+                     <label for="game-pin-input">Enter Game PIN:</label><br>
+                     <input type="number" id="game-pin-input" placeholder="6-Digit PIN" required /><br>
+                     <button type="submit">Join Game</button>
+                 </form>
+             </div>
+             <div id="error-message"></div>
+        </div>
+
+        <!-- Waiting Room -->
+        <div id="waiting-room" class="hidden">
+            <h2 id="waiting-title">Waiting for players... <span id="host-indicator"></span></h2>
+
+            <!-- Host Only Section -->
+            <div id="host-controls" class="hidden">
+                 <div id="game-pin-display">Game PIN: <span id="pin-value"></span></div> <!-- PIN Display Area -->
+                 <div id="qr-code-container" class="hidden"></div> <!-- QR Code -->
+                 <!-- Host FINAL Selection Dropdown -->
+                 <div id="quiz-selection-area">
+                     <label for="quiz-select">Choose a Quiz (Final Selection):</label>
+                     <select id="quiz-select" required>
+                        <option value="" disabled selected>-- Select Quiz --</option>
+                        <!-- Options populated dynamically -->
+                    </select>
+                 </div>
+                 <!-- Host Poll Results View -->
+                 <div id="host-poll-results" class="hidden">
+                     <h4>Quiz Poll Results:</h4>
+                     <div id="poll-results-list">
+                         <!-- Results populated by JS -->
+                     </div>
+                 </div>
+            </div>
+
+             <!-- Player Only Section -->
+             <div id="player-controls" class="hidden">
+                 <!-- Player sees host's final selection (if made) -->
+                 <div id="selected-quiz-display" class="hidden">Selected Quiz: <span id="selected-quiz-name"></span></div>
+                 <!-- Player Quiz Voting Area -->
+                 <div id="quiz-polling-area" class="hidden">
+                     <h4>Vote for the Quiz!</h4>
+                     <div id="poll-options-container">
+                         <!-- Buttons populated by JS -->
+                     </div>
+                 </div>
+             </div>
+
+            <!-- Player List (Visible to All) -->
+            <div id="player-list">
+                <h3>Players Joined:</h3>
+                <ul><!-- Player list updated dynamically --></ul>
+            </div>
+
+            <!-- Start Button (Host Only) -->
+            <div>
+                <button id="start-game-btn" class="hidden">Start Game</button>
+            </div>
+        </div>
+
+        <!-- Question Display -->
+        <div id="question-display" class="hidden">
+             <h2 id="question-number">Question X</h2>
+             <div id="timer">Time left: Xs</div>
+             <div id="question-text"></div>
+             <div id="options-container"></div>
+        </div>
+
+        <!-- Results Display -->
+        <div id="results-display" class="hidden">
+             <h2 id="results-question-text">Results for: ...</h2>
+             <p class="correct-answer-text">Correct Answer: <span id="correct-answer-value"></span></p>
+             <div id="results-list">
+                 <h3>Current Scores:</h3>
+                 <ul></ul>
+             </div>
+             <div>
+                 <button id="next-question-btn" class="hidden">Next Question</button>
+             </div>
+        </div>
+
+        <!-- Game Over Display -->
+        <div id="game-over-display" class="hidden">
+             <h2>Game Over!</h2>
+             <h3>Final Scores:</h3>
+             <div id="game-over-list">
+                 <ul></ul>
+             </div>
+             <div>
+                 <button id="play-again-btn" class="hidden">Play Again (Reset Game)</button>
+             </div>
+        </div>
+    </div>
+
+    <!-- External Libraries -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/qrcode.js"></script>
+
+    <!-- Link to External Game Logic Script -->
+    <script src="gameLogic.js"></script>
+</body>
+</html>
