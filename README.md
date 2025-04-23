@@ -19,7 +19,7 @@ A real-time quiz application inspired by Kahoot!, built with Node.js, Express, a
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/GodfreyDev/CahootKloneBackend.git
+    git clone https://github.com/GodfreyDev/CahootKlone.git
     ```
 
 2.  **Navigate to the project directory:**
