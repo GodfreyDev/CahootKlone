@@ -1,4 +1,3 @@
-console.log("SCRIPT START: Attempting to connect Socket.IO...");
 const socket = io({ });
 
 // --- UI Element References ---
@@ -23,7 +22,6 @@ let myVote = null;
 
 // --- Utility Functions ---
 function showScreen(screenId) {
-     console.log("FUNC CALL: showScreen(", screenId, ")");
      const screens = [initialScreen, waitingRoom, questionDisplay, resultsDisplay, gameOverDisplay];
      // Hide all screens first
      screens.forEach(screen => { if(screen) screen.classList.add('hidden') });
@@ -32,7 +30,6 @@ function showScreen(screenId) {
      const screenToShow = document.getElementById(screenId);
      if (screenToShow) {
           screenToShow.classList.remove('hidden');
-          console.log(`[showScreen] Successfully removed 'hidden' class from #${screenId}`);
      } else {
           console.error("showScreen: Tried to show non-existent screen:", screenId);
      }
@@ -49,7 +46,6 @@ function showScreen(screenId) {
      if(hostControlsDiv) {
          // Determine if the host controls should be hidden
          let shouldHideHostControls = !(isHost && screenId === 'waiting-room');
-         console.log(`[showScreen DEBUG] isHost: ${isHost}, screenId: ${screenId}, -> shouldHideHostControls: ${shouldHideHostControls}`);
          // Toggle the 'hidden' class based on the calculation
          hostControlsDiv.classList.toggle('hidden', shouldHideHostControls);
      } else {
@@ -144,7 +140,6 @@ function updatePlayerList(players = {}, gameStateStatus = 'waiting') {
 
  // Display Quiz Poll Buttons (Player) or Results (Host)
  function displayQuizPoll(currentVote, voteCounts = {}) {
-     console.log(`FUNC CALL: displayQuizPoll - Role: ${isHost ? 'Host' : 'Player'}, CurrentVote: ${currentVote}, Counts:`, voteCounts);
      // Player View: Voting Buttons
      if (!isHost && quizPollingArea && pollOptionsContainer) {
          pollOptionsContainer.innerHTML = ''; // Clear previous buttons
@@ -188,7 +183,6 @@ function updatePlayerList(players = {}, gameStateStatus = 'waiting') {
  }
 
  function resetClientState() {
-     console.log("FUNC CALL: resetClientState()");
      isHost = false; playerId = null; currentGameId = null; hostSocketIdFromServer = null;
      selectedQuizIdByHost = null; currentQuizData = []; availableQuizzes = []; myVote = null;
      clearInterval(questionTimerInterval);
@@ -217,11 +211,9 @@ function updatePlayerList(players = {}, gameStateStatus = 'waiting') {
      if(joinForm && joinForm.querySelector('button')) joinForm.querySelector('button').disabled = false;
      if(nicknameInput) nicknameInput.disabled = false;
      if(gamePinInput) gamePinInput.disabled = false;
-     console.log("FUNC CALL: resetClientState() FINISHED");
  }
 
  function handleAnswerClick(event) {
-      console.log("--- handleAnswerClick START ---");
       if (isHost || !currentGameId) {
            console.warn("handleAnswerClick ignored: Client is host or not in a game.");
            return;
@@ -233,35 +225,28 @@ function updatePlayerList(players = {}, gameStateStatus = 'waiting') {
       }
       const answerIndex = parseInt(selectedButton.dataset.index);
 
-      console.log(`handleAnswerClick: Processing click for index ${answerIndex}`);
       disableAnswerButtons(-1, answerIndex); // Highlight selected, disable all
 
-      console.log(`UI EVENT: Player ${playerId} emitting player:answer with index: ${answerIndex} for game ${currentGameId}`);
       socket.emit('player:answer', answerIndex);
-      console.log("--- handleAnswerClick END ---");
  }
 
  // --- Attach Socket Event Handlers ---
  socket.on('connect', () => {
-     console.log('SOCKET EVENT: connect');
      if(statusDiv) statusDiv.textContent = 'Connected';
      if(statusDiv) statusDiv.style.color = 'green';
  });
  socket.on('disconnect', (reason) => {
-     console.warn(`SOCKET EVENT: disconnect - ${reason}`);
      if(statusDiv) statusDiv.textContent = `Disconnected: ${reason}`;
      if(statusDiv) statusDiv.style.color = 'red';
      if(errorDiv) errorDiv.textContent = 'Connection lost. Please refresh or rejoin.';
      // resetClientState(); showScreen('initial-screen'); // Dont reset fully on disconnect
  });
  socket.on('connect_error', (err) => {
-     console.error(`SOCKET EVENT: connect_error - ${err.message}`, err);
      if(statusDiv) statusDiv.textContent = `Connection Failed`; if(statusDiv) statusDiv.style.color = 'red';
      resetClientState(); showScreen('initial-screen'); // Reset fully on connection error
      if(errorDiv) errorDiv.textContent = `Could not connect. (${err.message})`;
  });
  socket.on('error', (message) => {
-      console.error('SOCKET EVENT: error -', message); if(errorDiv) errorDiv.textContent = message;
       // Re-enable buttons if the error occurred during an action
       if (initialScreen && !initialScreen.classList.contains('hidden')) {
           if(createGameBtn) createGameBtn.disabled = false; if(joinForm && joinForm.querySelector('button')) joinForm.querySelector('button').disabled = false;
@@ -274,7 +259,6 @@ function updatePlayerList(players = {}, gameStateStatus = 'waiting') {
       }
  });
  socket.on('gameCreated', (data) => {
-      console.log('SOCKET EVENT: gameCreated -', data);
       isHost = true; // Set role before calling showScreen
       playerId = data.hostId;
       currentGameId = data.gameId; // This is the PIN
@@ -284,8 +268,6 @@ function updatePlayerList(players = {}, gameStateStatus = 'waiting') {
       if(pinValueSpan) {
           pinValueSpan.textContent = currentGameId; // Set the PIN value
           console.log(`PIN displayed: ${currentGameId}`);
-      } else {
-          console.error("gameCreated handler: pinValueSpan element not found!");
       }
 
       displayQrCode(currentGameId); // Generate QR code using the PIN
@@ -295,8 +277,7 @@ function updatePlayerList(players = {}, gameStateStatus = 'waiting') {
       displayQuizPoll(null, {}); // Show initial host poll results
  });
  socket.on('joined', (data) => {
-       console.log('SOCKET EVENT: joined -', data);
-       isHost = false; // Set role *before* calling showScreen
+       isHost = false; // Set role before calling showScreen
        playerId = data.playerId;
        currentGameId = data.gameId;
        selectedQuizIdByHost = data.selectedQuizId;
@@ -316,9 +297,8 @@ function updatePlayerList(players = {}, gameStateStatus = 'waiting') {
        showScreen('waiting-room'); // Now call showScreen
        displayQuizPoll(myVote, data.quizVotes); // Show player poll
  });
- socket.on('hostDisconnected', () => { console.warn('SOCKET EVENT: hostDisconnected'); if (!isHost) { alert('Host disconnected.'); } resetClientState(); showScreen('initial-screen'); });
+ socket.on('hostDisconnected', () => { console.warn('Host Disconnected'); if (!isHost) { alert('Host disconnected.'); } resetClientState(); showScreen('initial-screen'); });
  socket.on('gameReset', () => {
-      console.log('SOCKET EVENT: gameReset');
       selectedQuizIdByHost = null; currentQuizData = []; myVote = null;
       showScreen('waiting-room'); // Show waiting room again
       clearInterval(questionTimerInterval);
@@ -339,7 +319,6 @@ function updatePlayerList(players = {}, gameStateStatus = 'waiting') {
       if(playAgainBtn) playAgainBtn.classList.add('hidden');
  });
  socket.on('updateGameState', (state) => {
-      // console.log('SOCKET EVENT: updateGameState'); // Can be noisy
       if (!state || state.gameId !== currentGameId) return; // Ignore updates for wrong game
 
       // Update core state variables
@@ -403,7 +382,6 @@ function updatePlayerList(players = {}, gameStateStatus = 'waiting') {
       }
  });
  socket.on('showQuestion', (question) => {
-      console.log(`SOCKET EVENT: showQuestion received. Is client host? ${isHost}`);
       if (!question || typeof question.index !== 'number' || !question.text || !Array.isArray(question.options)) {
           console.error("Invalid question data received:", question);
           if(errorDiv) errorDiv.textContent = "Error receiving question data.";
@@ -439,8 +417,6 @@ function updatePlayerList(players = {}, gameStateStatus = 'waiting') {
 
           if (!isHost) {
               button.addEventListener('click', handleAnswerClick);
-          } else {
-               console.log(`[INFO] Host client, not attaching click handler for button ${index}.`);
           }
           optionsContainer.appendChild(button);
       });
@@ -451,7 +427,6 @@ function updatePlayerList(players = {}, gameStateStatus = 'waiting') {
  });
 
  socket.on('showResults', (results) => {
-       console.log('SOCKET EVENT: showResults');
        if (!results || typeof results.questionIndex !== 'number') { console.error("Invalid results data:", results); return; }
        if (results.gameId !== currentGameId) return; // Ignore results for wrong game
 
@@ -504,7 +479,7 @@ function updatePlayerList(players = {}, gameStateStatus = 'waiting') {
       disableAnswerButtons(correctAnswerIndex, playerAnswerForHighlight);
  });
  socket.on('gameOver', (data) => {
-       console.log('SOCKET EVENT: gameOver'); if (!data || !Array.isArray(data.scores)) { console.error("Invalid game over data:", data); return; }
+       if (!data || !Array.isArray(data.scores)) { console.error("Invalid game over data:", data); return; }
        if (data.gameId !== currentGameId) return; // Ignore game over for wrong game
 
       showScreen('game-over-display');
@@ -532,29 +507,26 @@ function updatePlayerList(players = {}, gameStateStatus = 'waiting') {
 
 // --- Wait for DOM, then Initialize UI and Apply PIN ---
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("EVENT: DOMContentLoaded START");
 
     // --- Assign UI Element References NOW ---
     statusDiv = document.getElementById('status'); errorDiv = document.getElementById('error-message'); initialScreen = document.getElementById('initial-screen'); createGameBtn = document.getElementById('create-game-btn'); joinForm = document.getElementById('join-form'); nicknameInput = document.getElementById('nickname-input'); gamePinInput = document.getElementById('game-pin-input'); waitingRoom = document.getElementById('waiting-room'); waitingTitle = document.getElementById('waiting-title'); hostIndicator = document.getElementById('host-indicator'); hostControlsDiv = document.getElementById('host-controls'); playerControlsDiv = document.getElementById('player-controls');
     gamePinDisplay = document.getElementById('game-pin-display');
     pinValueSpan = document.getElementById('pin-value');
     qrCodeContainer = document.getElementById('qr-code-container'); quizSelectionArea = document.getElementById('quiz-selection-area'); quizSelect = document.getElementById('quiz-select'); selectedQuizDisplay = document.getElementById('selected-quiz-display'); selectedQuizNameSpan = document.getElementById('selected-quiz-name'); quizPollingArea = document.getElementById('quiz-polling-area'); pollOptionsContainer = document.getElementById('poll-options-container'); hostPollResults = document.getElementById('host-poll-results'); pollResultsList = document.getElementById('poll-results-list'); playerListUl = document.querySelector('#player-list ul'); startGameBtn = document.getElementById('start-game-btn'); questionDisplay = document.getElementById('question-display'); questionNumberH2 = document.getElementById('question-number'); timerDiv = document.getElementById('timer'); questionTextDiv = document.getElementById('question-text'); optionsContainer = document.getElementById('options-container'); resultsDisplay = document.getElementById('results-display'); resultsQuestionTextH2 = document.getElementById('results-question-text'); correctAnswerValueSpan = document.getElementById('correct-answer-value'); resultsListUl = document.querySelector('#results-list ul'); nextQuestionBtn = document.getElementById('next-question-btn'); gameOverDisplay = document.getElementById('game-over-display'); gameOverListUl = document.querySelector('#game-over-list ul'); playAgainBtn = document.getElementById('play-again-btn');
-    console.log("EVENT: DOMContentLoaded - UI element references assigned.");
 
     // --- Check for PIN in URL ---
-    console.log("EVENT: DOMContentLoaded - Checking for URL PIN...");
     const urlParams = new URLSearchParams(window.location.search);
     const pin = urlParams.get('pin');
     let pinToApply = null;
 
     if (pin && /^\d{6}$/.test(pin)) {
-        console.log("EVENT: DOMContentLoaded - PIN found in URL:", pin);
+        console.log("PIN found in URL:", pin);
         pinToApply = pin;
          // Clean the URL immediately after reading the PIN
          window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
-         console.log("EVENT: DOMContentLoaded - Cleaned PIN from URL.");
-    } else if (pin) { console.log("EVENT: DOMContentLoaded - PIN found in URL, but invalid:", pin); }
-    else { console.log("EVENT: DOMContentLoaded - No PIN found in URL."); }
+         console.log("Cleaned PIN from URL.");
+    } else if (pin) { console.log("PIN found in URL, but invalid:", pin); }
+    else { console.log("No PIN found in URL."); }
 
     // --- Initial UI Setup ---
     resetClientState();
@@ -562,19 +534,125 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Apply PIN AFTER Reset and Show ---
     if (pinToApply) {
-        console.log("EVENT: DOMContentLoaded - Applying PIN from URL after init:", pinToApply);
-        if (gamePinInput) { gamePinInput.value = pinToApply; console.log("EVENT: DOMContentLoaded - Successfully applied PIN to input."); }
-        else { console.error("EVENT: DOMContentLoaded - gamePinInput element was NULL when applying PIN!"); }
-    } else { console.log("EVENT: DOMContentLoaded - No valid PIN to apply after init."); }
+        console.log("Applying PIN from URL after init:", pinToApply);
+        if (gamePinInput) { gamePinInput.value = pinToApply; console.log("Successfully applied PIN to input."); }
+        else { console.error("gamePinInput element was NULL when applying PIN!"); }
+    } else { console.log("No valid PIN to apply after init."); }
 
-    // --- Attach UI Event Listeners ---
-    console.log("EVENT: DOMContentLoaded - Attaching UI listeners...");
-    if(createGameBtn) createGameBtn.addEventListener('click', () => { if(errorDiv) errorDiv.textContent = ''; console.log("UI EVENT: Create Game clicked"); if(createGameBtn) createGameBtn.disabled = true; if(joinForm && joinForm.querySelector('button')) joinForm.querySelector('button').disabled = true; socket.emit('host:createGame'); });
-    if(joinForm) joinForm.addEventListener('submit', (e) => { e.preventDefault(); if(errorDiv) errorDiv.textContent = ''; const nickname = nicknameInput ? nicknameInput.value.trim() : ''; const gameId = gamePinInput ? gamePinInput.value.trim() : ''; if (!nickname) { if(errorDiv) errorDiv.textContent = 'Enter nickname.'; return; } if (!gameId || !/^\d{6}$/.test(gameId)) { if(errorDiv) errorDiv.textContent = 'Enter valid 6-digit PIN.'; return; } console.log(`UI EVENT: Joining: N=${nickname}, P=${gameId}`); if(nicknameInput) nicknameInput.disabled = true; if(gamePinInput) gamePinInput.disabled = true; if(joinForm.querySelector('button')) joinForm.querySelector('button').disabled = true; if(createGameBtn) createGameBtn.disabled = true; socket.emit('player:join', { nickname: nickname, gameId: gameId }); });
-    if(quizSelect) quizSelect.addEventListener('change', () => { const selectedId = quizSelect.value; if (selectedId && currentGameId && isHost) { console.log(`UI EVENT: Host selected quiz ID: ${selectedId}`); if(errorDiv) errorDiv.textContent = ''; socket.emit('host:selectQuiz', selectedId); } });
-    if(startGameBtn) startGameBtn.addEventListener('click', () => { if(errorDiv) errorDiv.textContent = ''; console.log("UI EVENT: Start Game clicked"); if (!selectedQuizIdByHost) { if(errorDiv) errorDiv.textContent = "Select quiz first."; return; } if(startGameBtn) startGameBtn.disabled = true; socket.emit('host:startGame'); });
-    if(nextQuestionBtn) nextQuestionBtn.addEventListener('click', () => { if(errorDiv) errorDiv.textContent = ''; console.log("UI EVENT: Next Question clicked"); if(nextQuestionBtn) nextQuestionBtn.disabled = true; socket.emit('host:nextQuestion'); });
-    if(playAgainBtn) playAgainBtn.addEventListener('click', () => { if(errorDiv) errorDiv.textContent = ''; console.log("UI EVENT: Play Again clicked"); if(playAgainBtn) playAgainBtn.disabled = true; socket.emit('host:resetGame'); });
+    // --- Create Game Button ---
+    if (createGameBtn) {
+        createGameBtn.addEventListener('click', () => {
+            // Clear any previous error messages
+            if (errorDiv) errorDiv.textContent = '';
 
-    console.log("EVENT: DOMContentLoaded END");
+            // Disable buttons to prevent multiple actions
+            createGameBtn.disabled = true;
+            const joinButton = joinForm ? joinForm.querySelector('button') : null;
+            if (joinButton) {
+                joinButton.disabled = true;
+            }
+
+            // Signal the server to create a new game
+            socket.emit('host:createGame');
+        });
+    }
+
+    // --- Join Game Form ---
+    if (joinForm) {
+        joinForm.addEventListener('submit', (e) => {
+            e.preventDefault(); // Prevent default form submission behavior
+
+            // Clear any previous error messages
+            if (errorDiv) errorDiv.textContent = '';
+
+            // Get nickname and game ID from input fields, trimming whitespace
+            const nickname = nicknameInput ? nicknameInput.value.trim() : '';
+            const gameId = gamePinInput ? gamePinInput.value.trim() : '';
+
+            // Validate nickname input
+            if (!nickname) {
+                if (errorDiv) errorDiv.textContent = 'Please enter a nickname.';
+                return; // Stop processing if validation fails
+            }
+
+            // Validate game ID input (must be exactly 6 digits)
+            if (!gameId || !/^\d{6}$/.test(gameId)) {
+                if (errorDiv) errorDiv.textContent = 'Please enter a valid 6-digit game PIN.';
+                return; // Stop processing if validation fails
+            }
+
+            // Disable inputs and buttons to prevent multiple submissions
+            if (nicknameInput) nicknameInput.disabled = true;
+            if (gamePinInput) gamePinInput.disabled = true;
+            const joinButton = joinForm.querySelector('button');
+            if (joinButton) joinButton.disabled = true;
+            if (createGameBtn) createGameBtn.disabled = true; // Also disable create game button
+
+            // Signal the server that a player wants to join
+            socket.emit('player:join', { nickname, gameId }); // Use object shorthand
+        });
+    }
+
+    // --- Quiz Selection Dropdown ---
+    if (quizSelect) {
+        quizSelect.addEventListener('change', () => {
+            const selectedId = quizSelect.value;
+
+            // Check if a valid quiz is selected, a game is active, and the user is the host
+            if (selectedId && currentGameId && isHost) {
+                 // Clear any previous error messages upon valid selection
+                if (errorDiv) errorDiv.textContent = '';
+                // Signal the server about the host's quiz selection
+                socket.emit('host:selectQuiz', selectedId);
+            }
+        });
+    }
+
+    // --- Start Game Button ---
+    if (startGameBtn) {
+        startGameBtn.addEventListener('click', () => {
+            // Clear any previous error messages
+            if (errorDiv) errorDiv.textContent = '';
+
+            // Ensure a quiz has been selected before starting
+            if (!selectedQuizIdByHost) {
+                if (errorDiv) errorDiv.textContent = "Please select a quiz first.";
+                return; // Stop processing if no quiz is selected
+            }
+
+            // Disable the button to prevent multiple clicks
+            startGameBtn.disabled = true;
+
+            // Signal the server to start the game
+            socket.emit('host:startGame');
+        });
+    }
+
+    // --- Next Question Button ---
+    if (nextQuestionBtn) {
+        nextQuestionBtn.addEventListener('click', () => {
+            // Clear any previous error messages
+            if (errorDiv) errorDiv.textContent = '';
+
+            // Disable the button to prevent multiple clicks
+            nextQuestionBtn.disabled = true;
+
+            // Signal the server to proceed to the next question
+            socket.emit('host:nextQuestion');
+        });
+    }
+
+    // --- Play Again Button ---
+    if (playAgainBtn) {
+        playAgainBtn.addEventListener('click', () => {
+             // Clear any previous error messages
+            if (errorDiv) errorDiv.textContent = '';
+
+            // Disable the button to prevent multiple clicks
+            playAgainBtn.disabled = true;
+
+            // Signal the server to reset the game for another round
+            socket.emit('host:resetGame');
+        });
+    }
 });

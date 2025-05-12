@@ -2,16 +2,16 @@ const express = require("express");
 const http = require("http");
 const path = require("path");
 const fs = require("fs");
+const { MongoClient, ObjectId, ServerApiVersion } = require("mongodb");
 const { Server } = require("socket.io");
-
 const app = express();
 const server = http.createServer(app);
 
 // --- Configuration ---
 const allowedOrigins = [
-  "http://localhost:3000",         /////////////////////////////////////////////
-  "https://cahootklone.glitch.me" // MAKE SURE this matches Glitch project name
-];                               /////////////////////////////////////////////
+  "http://localhost:3000",
+  "https://cahootklone.glitch.me"
+];
 
 const io = new Server(server, {
   cors: {
@@ -19,52 +19,98 @@ const io = new Server(server, {
       if (!origin || allowedOrigins.indexOf(origin) !== -1) { callback(null, true); }
       else { console.warn(`[CORS Blocked] Origin: ${origin}`); callback(new Error(`Origin ${origin} not allowed by CORS`)); }
     },
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
   },
 });
 
-// --- Game Data ---
-let quizzes = {}; // Initialize empty
+app.use(express.json());
 
-function loadQuizzes() {
+// --- MongoDB Connection ---
+const MONGO_URI = "mongodb+srv://Godfrey:1uNswoV5GViFW3Or@kahoot-klone-cluster.1svtxji.mongodb.net/kahootCloneDb?retryWrites=true&w=majority";
+let db;
+let quizzesCollection;
+
+
+const DBNAME_FROM_URI_MATCH = MONGO_URI.match(/\/\/.*?\/([^?]*)/);
+const DBNAME_TO_USE = DBNAME_FROM_URI_MATCH && DBNAME_FROM_URI_MATCH[1] ? DBNAME_FROM_URI_MATCH[1] : "kahootClone_default_db"; // Fallback if not in URI or empty
+
+async function connectDB() {
+  console.log("[MongoDB] Attempting to connect...");
+  try {
+    // Create a MongoClient
+    const client = new MongoClient(MONGO_URI, {
+      serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+      }
+    });
+
+    console.log("[MongoDB] MongoClient created with Server API options. Calling connect()...");
+    await client.connect();
+    console.log("[MongoDB] Successfully connected to MongoDB server (after client.connect()).");
+
+    // Explicitly get the database.
+    db = client.db(DBNAME_TO_USE);
+
+    console.log(`[MongoDB] Using database: ${db.databaseName}`);
+    quizzesCollection = db.collection("quizzes");
+    console.log("[MongoDB] Quizzes collection initialized ('quizzes').");
+
+    // Send a ping to confirm successful connection
+    await db.admin().command({ ping: 1 });
+    console.log("[MongoDB] Ping successful.");
+
+  } catch (error) {
+    console.error("[MongoDB] Error connecting to MongoDB:", error);
+    process.exit(1);
+  }
+}
+
+// --- Game Data ---
+let quizzes = {}; // This will be populated from MongoDB
+
+async function loadQuizzes() {
+    console.log("[Server] Attempting to load quizzes from MongoDB...");
+    if (!quizzesCollection) {
+        console.error("[Quiz Load Error] Quizzes collection is not initialized. DB connection might have failed or not completed yet.");
+        quizzes = {};
+        return;
+    }
     try {
-        const quizFilePath = path.resolve(__dirname, 'quizzes.json');
-        console.log(`[Server Startup] Attempting to load quizzes from: ${quizFilePath}`);
-        if (fs.existsSync(quizFilePath)) {
-            const rawData = fs.readFileSync(quizFilePath);
-            quizzes = JSON.parse(rawData);
-            console.log(`[Server Startup] Successfully loaded ${Object.keys(quizzes).length} quizzes from quizzes.json`);
-            // Basic validation
-            for (const quizId in quizzes) {
-                if (!quizzes[quizId].name || !Array.isArray(quizzes[quizId].data)) {
-                    console.error(`[Quiz Load Error] Invalid structure for quiz ID: ${quizId}`);
-                    delete quizzes[quizId]; // Remove invalid quiz
-                } else {
-                    // Add question count for convenience if not already present (though getAvailableQuizzesForClient calculates it too)
-                    quizzes[quizId].questionCount = quizzes[quizId].data.length;
-                }
+        console.log("[Quiz Load] Fetching all documents from quizzes collection...");
+        const quizzesFromDB = await quizzesCollection.find({}).toArray();
+        console.log(`[Quiz Load] Found ${quizzesFromDB.length} documents in DB.`);
+
+        const newQuizzes = {};
+        quizzesFromDB.forEach(quizDoc => {
+            if (quizDoc._id && quizDoc.name && Array.isArray(quizDoc.data)) {
+                newQuizzes[quizDoc._id.toString()] = {
+                    name: quizDoc.name,
+                    data: quizDoc.data,
+                    questionCount: quizDoc.data.length,
+                };
+            } else {
+                console.error(`[Quiz Load Error] Invalid structure or missing _id for quiz document: ${JSON.stringify(quizDoc)}`);
             }
-        } else {
-            console.warn(`[Server Startup] quizzes.json not found at ${quizFilePath}. Using empty quiz list.`);
-            quizzes = {};
-        }
+        });
+        quizzes = newQuizzes;
+        console.log(`[Server] Successfully loaded ${Object.keys(quizzes).length} quizzes into memory from MongoDB.`);
     } catch (error) {
-        console.error("[Server Startup] Error loading or parsing quizzes.json:", error);
-        quizzes = {}; // Default to empty on error
+        console.error("[Server] Error loading quizzes from MongoDB:", error);
+        quizzes = {};
     }
 }
-loadQuizzes(); // Load quizzes when server starts
 
 function getAvailableQuizzesForClient() {
     if (!quizzes || Object.keys(quizzes).length === 0) {
-        return []; // Return empty array if no quizzes loaded
+        return [];
     }
     return Object.entries(quizzes).map(([id, details]) => {
-        // Ensure details and data exist before accessing length
         const questionCount = (details && details.data && Array.isArray(details.data)) ? details.data.length : 0;
         return {
             id: id,
-            name: details.name || `Unnamed Quiz (${id})`, // Provide default name if missing
+            name: details.name || `Unnamed Quiz (${id})`,
             questionCount: questionCount
         };
     });
@@ -78,12 +124,12 @@ function createNewGameState(hostId) {
     gameId: null,
     hostSocketId: hostId,
     status: "waiting",
-    selectedQuizId: null, // Host's final selection
+    selectedQuizId: null,
     selectedQuizName: null,
-    players: {}, // { socketId: { name: 'PlayerName', score: 0, answered: false, votedForQuizId: null } }
-    quizVotes: {}, // { quizId: count }
+    players: {},
+    quizVotes: {},
     currentQuestionIndex: -1,
-    questionTimer: null, // Stores the NodeJS Timeout object reference
+    questionTimer: null,
     playerAnswers: {},
   };
 }
@@ -96,30 +142,25 @@ function generateGameId() {
   return gameId;
 }
 
-// --- Serve Static Files & Libraries ---
+// --- Serve Files ---
 const qrcodePath = path.resolve(__dirname, 'node_modules/qrcode-generator/qrcode.js');
-console.log(`[Server Startup] Expected path for qrcode.js: ${qrcodePath}`);
 
-// Serve qrcode.js
 app.get('/qrcode.js', (req, res, next) => {
-  console.log("--> Request received for /qrcode.js");
   fs.access(qrcodePath, fs.constants.R_OK, (err) => {
       if (err) {
           console.error(`--> !!! Error accessing qrcode.js at resolved path ${qrcodePath}:`, err);
           res.status(500).send(`Internal Server Error: QR Code library (${qrcodePath}) not found or readable on server.`);
       } else {
-          console.log(`--> Attempting to serve qrcode.js from: ${qrcodePath}`);
           res.sendFile(qrcodePath, (sendErr) => {
               if (sendErr) {
                   console.error("--> !!! Error sending qrcode.js:", sendErr);
                   if (!res.headersSent) { next(sendErr); }
-              } else { console.log("--> Served qrcode.js successfully."); }
+              }
           });
       }
   });
 });
 
-// Serve index.html for root requests
 app.get("/", (req, res) => {
     console.log("--> Request received for / (Root Route)");
     const indexPath = path.join(__dirname, "public", "index.html");
@@ -129,36 +170,215 @@ app.get("/", (req, res) => {
               res.status(500).send("Cannot find main application file.");
          } else { res.sendFile(indexPath); }
      });
-  });
+});
 
-// Serve other static files from public
+app.get("/quiz-editor", (req, res) => {
+    console.log("--> Request received for /quiz-editor");
+    res.sendFile(path.join(__dirname, "public", "quiz-editor.html"));
+});
+
 app.use(express.static(path.join(__dirname, "public")));
-console.log(`[Server Startup] Serving static files from: ${path.join(__dirname, "public")}`);
+
+
+// --- API Endpoints for Quiz Management ---
+app.get("/api/quizzes", async (req, res) => {
+    console.log("[API GET /api/quizzes] Request received.");
+    if (!quizzesCollection) {
+        console.error("[API GET /api/quizzes] Quizzes collection not available.");
+        return res.status(503).json({ message: "Database not available" });
+    }
+    try {
+        const allQuizzes = await quizzesCollection.find({}).toArray();
+        console.log(`[API GET /api/quizzes] Fetched ${allQuizzes.length} quizzes from DB.`);
+        res.json(allQuizzes.map(q => ({...q, _id: q._id.toString()})));
+    } catch (error) {
+        console.error("[API GET /api/quizzes] Error fetching quizzes:", error);
+        res.status(500).json({ message: "Error fetching quizzes" });
+    }
+});
+
+app.get("/api/quizzes/:id", async (req, res) => {
+    const quizId = req.params.id;
+    console.log(`[API GET /api/quizzes/${quizId}] Request received for single quiz.`);
+    if (!quizzesCollection) {
+        console.error(`[API GET /api/quizzes/${quizId}] Quizzes collection not available.`);
+        return res.status(503).json({ message: "Database not available" });
+    }
+    try {
+        if (!ObjectId.isValid(quizId)) {
+            console.warn(`[API GET /api/quizzes/${quizId}] Invalid quiz ID format.`);
+            return res.status(400).json({ message: "Invalid quiz ID format." });
+        }
+        const quiz = await quizzesCollection.findOne({ _id: new ObjectId(quizId) });
+        if (!quiz) {
+            console.warn(`[API GET /api/quizzes/${quizId}] Quiz not found.`);
+            return res.status(404).json({ message: "Quiz not found" });
+        }
+        console.log(`[API GET /api/quizzes/${quizId}] Fetched quiz: ${quiz.name}`);
+        const quizToSend = {
+            _id: quiz._id.toString(),
+            name: quiz.name,
+            data: quiz.data || [],
+        };
+        res.json(quizToSend);
+    } catch (error) {
+        console.error(`[API GET /api/quizzes/${quizId}] Error fetching quiz:`, error);
+        res.status(500).json({ message: "Error fetching single quiz" });
+    }
+});
+
+app.post("/api/quizzes", async (req, res) => {
+    console.log("[API POST /api/quizzes] Request received.");
+    if (!quizzesCollection) {
+        console.error("[API POST /api/quizzes] Quizzes collection not available.");
+        return res.status(503).json({ message: "Database not available" });
+    }
+    try {
+        const newQuizData = req.body;
+        if (!newQuizData.name || !Array.isArray(newQuizData.data) || newQuizData.data.length === 0) {
+            console.warn("[API POST /api/quizzes] Invalid quiz data:", newQuizData);
+            return res.status(400).json({ message: "Invalid quiz data. Name and at least one question are required." });
+        }
+        newQuizData.data.forEach((q, index) => {
+            if (!q.question || !Array.isArray(q.options) || q.options.length < 2 || typeof q.correctAnswer !== 'number') {
+                console.warn(`[API POST /api/quizzes] Invalid question structure at index ${index}:`, q);
+                throw new Error(`Invalid question structure in question ${index + 1}.`);
+            }
+        });
+
+        const result = await quizzesCollection.insertOne({
+            name: newQuizData.name,
+            data: newQuizData.data,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        });
+        console.log(`[API POST /api/quizzes] Quiz created with ID: ${result.insertedId}`);
+        await loadQuizzes();
+        notifyWaitingRoomsOfQuizUpdate();
+        res.status(201).json({ message: "Quiz created successfully", id: result.insertedId.toString() });
+    } catch (error) {
+        console.error("[API POST /api/quizzes] Error creating quiz:", error);
+        res.status(500).json({ message: error.message || "Error creating quiz" });
+    }
+});
+
+app.put("/api/quizzes/:id", async (req, res) => {
+    const quizId = req.params.id;
+    console.log(`[API PUT /api/quizzes/${quizId}] Request received.`);
+    if (!quizzesCollection) {
+        console.error(`[API PUT /api/quizzes/${quizId}] Quizzes collection not available.`);
+        return res.status(503).json({ message: "Database not available" });
+    }
+    try {
+        const updatedQuizData = req.body;
+        if (!ObjectId.isValid(quizId)) {
+            console.warn(`[API PUT /api/quizzes/${quizId}] Invalid quiz ID format.`);
+            return res.status(400).json({ message: "Invalid quiz ID format." });
+        }
+        if (!updatedQuizData.name || !Array.isArray(updatedQuizData.data) || updatedQuizData.data.length === 0) {
+            console.warn(`[API PUT /api/quizzes/${quizId}] Invalid quiz data:`, updatedQuizData);
+            return res.status(400).json({ message: "Invalid quiz data. Name and at least one question are required." });
+        }
+        updatedQuizData.data.forEach((q, index) => {
+            if (!q.question || !Array.isArray(q.options) || q.options.length < 2 || typeof q.correctAnswer !== 'number') {
+                 console.warn(`[API PUT /api/quizzes/${quizId}] Invalid question structure at index ${index}:`, q);
+                throw new Error(`Invalid question structure in question ${index + 1}.`);
+            }
+        });
+
+        const result = await quizzesCollection.updateOne(
+            { _id: new ObjectId(quizId) },
+            { $set: {
+                name: updatedQuizData.name,
+                data: updatedQuizData.data,
+                updatedAt: new Date()
+              }
+            }
+        );
+        if (result.matchedCount === 0) {
+            console.warn(`[API PUT /api/quizzes/${quizId}] Quiz not found for update.`);
+            return res.status(404).json({ message: "Quiz not found" });
+        }
+        console.log(`[API PUT /api/quizzes/${quizId}] Quiz updated successfully. Matched: ${result.matchedCount}, Modified: ${result.modifiedCount}`);
+        await loadQuizzes();
+        notifyWaitingRoomsOfQuizUpdate();
+        res.json({ message: "Quiz updated successfully" });
+    } catch (error) {
+        console.error(`[API PUT /api/quizzes/${quizId}] Error updating quiz:`, error);
+        res.status(500).json({ message: error.message || "Error updating quiz" });
+    }
+});
+
+app.delete("/api/quizzes/:id", async (req, res) => {
+    const quizId = req.params.id;
+    console.log(`[API DELETE /api/quizzes/${quizId}] Request received.`);
+    if (!quizzesCollection) {
+        console.error(`[API DELETE /api/quizzes/${quizId}] Quizzes collection not available.`);
+        return res.status(503).json({ message: "Database not available" });
+    }
+    try {
+        if (!ObjectId.isValid(quizId)) {
+            console.warn(`[API DELETE /api/quizzes/${quizId}] Invalid quiz ID format.`);
+            return res.status(400).json({ message: "Invalid quiz ID format." });
+        }
+        const result = await quizzesCollection.deleteOne({ _id: new ObjectId(quizId) });
+        if (result.deletedCount === 0) {
+            console.warn(`[API DELETE /api/quizzes/${quizId}] Quiz not found for deletion.`);
+            return res.status(404).json({ message: "Quiz not found" });
+        }
+        console.log(`[API DELETE /api/quizzes/${quizId}] Quiz deleted successfully. Count: ${result.deletedCount}`);
+        await loadQuizzes();
+        notifyWaitingRoomsOfQuizUpdate();
+        res.json({ message: "Quiz deleted successfully" });
+    } catch (error) {
+        console.error(`[API DELETE /api/quizzes/${quizId}] Error deleting quiz:`, error);
+        res.status(500).json({ message: "Error deleting quiz" });
+    }
+});
+
+function notifyWaitingRoomsOfQuizUpdate() {
+    console.log("[Notification] Checking for waiting rooms to notify of quiz list update...");
+    let notifiedCount = 0;
+    activeGames.forEach(game => {
+        if (game.status === 'waiting') {
+            console.log(`[Notification] Notifying game ${game.gameId}`);
+            io.to(game.gameId).emit('updateGameState', getSanitizedGameState(game));
+            notifiedCount++;
+        }
+    });
+    if (notifiedCount > 0) {
+        console.log(`[Notification] Notified ${notifiedCount} waiting game(s).`);
+    } else {
+        console.log("[Notification] No active waiting games to notify.");
+    }
+}
 
 // --- Socket.IO Connection Logic ---
 io.on("connection", (socket) => {
   console.log(`User connected: ${socket.id}`);
   socket.data.gameId = null;
 
-  // --- Host Actions ---
   socket.on("host:createGame", () => {
     if (socket.data.gameId && activeGames.has(socket.data.gameId)) { socket.emit("error", "You are already in a game."); return; }
     const gameId = generateGameId(); const newGame = createNewGameState(socket.id);
     newGame.gameId = gameId; activeGames.set(gameId, newGame);
     socket.data.gameId = gameId; socket.join(gameId);
-    console.log(`Host ${socket.id} created Game Room: ${gameId}`);
+    console.log(`Host ${socket.id} created Game Room: ${gameId}. Sending ${getAvailableQuizzesForClient().length} available quizzes.`);
     socket.emit("gameCreated", { gameId: gameId, hostId: socket.id, availableQuizzes: getAvailableQuizzesForClient() });
     io.to(gameId).emit("updateGameState", getSanitizedGameState(newGame));
   });
 
-   socket.on("host:selectQuiz", (quizId) => { // Host's Final Selection
+   socket.on("host:selectQuiz", (quizId) => {
        const gameId = socket.data.gameId; const game = activeGames.get(gameId);
        if (!game || game.hostSocketId !== socket.id) { socket.emit("error", "Only the host can select a quiz."); return; }
        if (game.status !== "waiting") { socket.emit("error", "Cannot change quiz after the game has started."); return; }
-       if (!quizzes || !quizzes[quizId]) { socket.emit("error", "Selected quiz not found/loaded."); return; } // Check loaded quizzes
+       if (!quizzes || !quizzes[quizId]) {
+           console.error(`[Socket host:selectQuiz] Host ${socket.id} tried to select non-existent quiz ID: ${quizId}. Available: ${Object.keys(quizzes).join(', ')}`);
+           socket.emit("error", `Selected quiz (ID: ${quizId}) not found/loaded.`); return;
+       }
        game.selectedQuizId = quizId; game.selectedQuizName = quizzes[quizId].name;
        console.log(`Game ${gameId}: Host FINALIZED selection to '${game.selectedQuizName}' (ID: ${quizId})`);
-       io.to(gameId).emit("updateGameState", getSanitizedGameState(game)); // Update state with final choice
+       io.to(gameId).emit("updateGameState", getSanitizedGameState(game));
    });
 
   socket.on("host:startGame", () => {
@@ -166,25 +386,24 @@ io.on("connection", (socket) => {
     if (!game || game.hostSocketId !== socket.id) { socket.emit("error", "Only the host can start the game."); return; }
     if (game.status !== "waiting") { socket.emit("error", "Game is not in a waiting state."); return; }
      if (!game.selectedQuizId) { socket.emit("error", "Please select a quiz before starting."); return; }
-     if (!quizzes || !quizzes[game.selectedQuizId]) { socket.emit("error", "Selected quiz data is not available."); return; } // Check quiz exists
+     if (!quizzes || !quizzes[game.selectedQuizId]) { socket.emit("error", "Selected quiz data is not available."); return; }
      const playerIds = Object.keys(game.players);
      if (playerIds.length === 0) { socket.emit("error", "Need at least one player to start."); return; }
     console.log(`Game ${gameId} starting with quiz '${game.selectedQuizName}'...`);
-    game.status = "question"; game.currentQuestionIndex = -1; clearTimeout(game.questionTimer); game.questionTimer = null; // Ensure timer cleared
+    game.status = "question"; game.currentQuestionIndex = -1; clearTimeout(game.questionTimer); game.questionTimer = null;
     nextQuestion(gameId);
   });
 
   socket.on("host:nextQuestion", () => {
     const gameId = socket.data.gameId; const game = activeGames.get(gameId);
     if (!game || game.hostSocketId !== socket.id) { socket.emit("error", "Only the host can advance the question."); return; }
-    if (game.status === "results") { // Only advance from results screen
+    if (game.status === "results") {
         console.log(`G:${gameId} - Host manually triggered nextQuestion.`);
-        clearTimeout(game.questionTimer); game.questionTimer = null; // Clear any pending timer
+        clearTimeout(game.questionTimer); game.questionTimer = null;
         nextQuestion(gameId);
     } else { socket.emit("error", "Can only advance to next question from results screen."); }
   });
 
-  // --- Player Actions ---
   socket.on("player:join", ({ nickname, gameId }) => {
     if (!nickname || !gameId) { socket.emit("error", "Nickname and Game PIN are required."); return; }
     if (socket.data.gameId && activeGames.has(socket.data.gameId)) { socket.emit("error", "You are already in a game."); return; }
@@ -213,52 +432,32 @@ io.on("connection", (socket) => {
   });
 
   socket.on("player:answer", (answerIndex) => {
-    console.log(`>>> SERVER received player:answer from ${socket.id} with index: ${answerIndex}`);
     const gameId = socket.data.gameId; const game = activeGames.get(gameId);
-
-    // --- Validations ---
-    if (!game || !game.players[socket.id] || socket.id === game.hostSocketId) { console.warn("Answer rejected (A1): Invalid game/player/host."); return; }
-    if (game.status !== "question") { console.warn(`Answer rejected (A2): Game status is ${game.status}, not 'question'.`); return; }
-    if (!quizzes || !game.selectedQuizId || !quizzes[game.selectedQuizId]) { console.error("Answer rejected (A3): Selected quiz data missing."); return; }
+    if (!game || !game.players[socket.id] || socket.id === game.hostSocketId) { return; }
+    if (game.status !== "question") { return; }
+    if (!quizzes || !game.selectedQuizId || !quizzes[game.selectedQuizId]) { return; }
     const selectedQuizData = quizzes[game.selectedQuizId].data;
-    if (game.currentQuestionIndex < 0 || game.currentQuestionIndex >= selectedQuizData.length) { console.error("Answer rejected (A4): Invalid question index."); return; }
+    if (game.currentQuestionIndex < 0 || game.currentQuestionIndex >= selectedQuizData.length) { return; }
     const currentQuestion = selectedQuizData[game.currentQuestionIndex];
-    if (typeof answerIndex !== 'number' || answerIndex < 0 || answerIndex >= currentQuestion.options.length) { console.warn(`Answer rejected (A5): Invalid answer index ${answerIndex}.`); socket.emit("error", "Invalid answer submitted."); return; }
-    if (game.players[socket.id].answered) { console.log(`Answer rejected (A6): Player ${socket.id} already answered.`); return; }
-    // --- End Validations ---
+    if (typeof answerIndex !== 'number' || answerIndex < 0 || answerIndex >= currentQuestion.options.length) { socket.emit("error", "Invalid answer submitted."); return; }
+    if (game.players[socket.id].answered) { return; }
 
-    console.log(`G:${gameId} Q:${game.currentQuestionIndex} - Player ${game.players[socket.id].name} (${socket.id}) answered: ${answerIndex}.`);
     game.players[socket.id].answered = true;
     game.playerAnswers[socket.id] = answerIndex;
-
-    // --- Check if all players have answered ---
     const activePlayerIds = Object.keys(game.players);
     let allAnswered = false;
     if (activePlayerIds.length > 0) {
-        let answeredCount = 0;
-        activePlayerIds.forEach(pid => {
-            if (game.players[pid]?.answered) {
-                answeredCount++;
-            }
-        });
+        let answeredCount = 0; activePlayerIds.forEach(pid => { if (game.players[pid]?.answered) answeredCount++; });
         allAnswered = (answeredCount === activePlayerIds.length);
-        console.log(`G:${gameId} Q:${game.currentQuestionIndex} - Answer Count Check: TotalPlayers: ${activePlayerIds.length}, Answered: ${answeredCount}, AllAnswered: ${allAnswered}`);
-    } else {
-        console.log(`G:${gameId} Q:${game.currentQuestionIndex} - Answer Count Check: No active players found.`);
     }
-    // --- End Check ---
-
     if (allAnswered) {
-      console.log(`✅ G:${gameId} Q:${game.currentQuestionIndex} - All players answered. Clearing timer (${game.questionTimer}) and calling showResults.`);
       clearTimeout(game.questionTimer); game.questionTimer = null;
-      showResults(gameId); // Go to results
+      showResults(gameId);
     } else {
-      console.log(`⏳ G:${gameId} Q:${game.currentQuestionIndex} - Not all answered. Sending state update only.`);
-      io.to(gameId).emit("updateGameState", getSanitizedGameState(game)); // Show progress
+      io.to(gameId).emit("updateGameState", getSanitizedGameState(game));
     }
   });
 
-  // --- Disconnection Handling ---
   socket.on("disconnect", (reason) => {
      console.log(`User disconnected: ${socket.id}. Reason: ${reason}`);
     const gameId = socket.data.gameId;
@@ -271,25 +470,13 @@ io.on("connection", (socket) => {
       else if (game.players[socket.id]) {
         const playerState = game.players[socket.id]; const playerName = playerState.name;
         const voteToRemove = playerState.votedForQuizId; const wasAnswered = playerState.answered;
-        console.log(`Player ${playerName} (${socket.id}) left game ${gameId}.`);
-        if (voteToRemove && game.quizVotes[voteToRemove] > 0) { game.quizVotes[voteToRemove]--; console.log(`Decremented vote for ${voteToRemove} due to disconnect.`); }
+        if (voteToRemove && game.quizVotes[voteToRemove] > 0) { game.quizVotes[voteToRemove]--; }
         delete game.players[socket.id]; delete game.playerAnswers[socket.id];
         io.to(gameId).emit("updateGameState", getSanitizedGameState(game));
-
-        // Check if all remaining answered
         if (game.status === "question" && !wasAnswered) {
            const activePlayerIds = Object.keys(game.players);
-           let allAnswered = false; // Default false
-           if(activePlayerIds.length > 0) {
-                let answeredCount = 0; activePlayerIds.forEach(pid => { if (game.players[pid]?.answered) answeredCount++; });
-                allAnswered = (answeredCount === activePlayerIds.length);
-                console.log(`G:${gameId} Q:${game.currentQuestionIndex} - Disconnect Check: RemPlayers: ${activePlayerIds.length}, Answered: ${answeredCount}, AllRemAnswered: ${allAnswered}`);
-           } else {
-               console.log(`G:${gameId} Q:${game.currentQuestionIndex} - Disconnect Check: No players remaining.`);
-           }
-
+           let allAnswered = activePlayerIds.length > 0 && activePlayerIds.every(pid => game.players[pid]?.answered);
            if (allAnswered) {
-             console.log(`✅ G:${gameId} Q:${game.currentQuestionIndex} - All remaining answered after disconnect. Clearing timer (${game.questionTimer}) & showing results.`);
              clearTimeout(game.questionTimer); game.questionTimer = null;
              showResults(gameId);
            }
@@ -299,12 +486,10 @@ io.on("connection", (socket) => {
     socket.data.gameId = null;
   });
 
-  // --- Game Reset (Host Action) ---
   socket.on("host:resetGame", () => {
     const gameId = socket.data.gameId; const game = activeGames.get(gameId);
     if (!game || game.hostSocketId !== socket.id) { socket.emit("error", "Only the host can reset the game."); return; }
     if (game.status !== "gameOver" && game.status !== "waiting") { socket.emit("error","Can only reset the game when it is over or waiting for players."); return; }
-    console.log(`Host ${socket.id} resetting game ${gameId} to waiting state.`);
     game.status = "waiting"; game.currentQuestionIndex = -1; game.playerAnswers = {};
     game.selectedQuizId = null; game.selectedQuizName = null; game.quizVotes = {};
     clearTimeout(game.questionTimer); game.questionTimer = null;
@@ -323,58 +508,37 @@ function nextQuestion(gameId) {
   game.currentQuestionIndex++;
   if (game.currentQuestionIndex >= selectedQuizData.length) { console.log(`G:${gameId} - No more questions. Ending game.`); endGame(gameId); return; }
 
-  console.log(`G:${gameId} Q:${game.currentQuestionIndex + 1} - Preparing question.`);
   game.status = "question"; game.playerAnswers = {};
   Object.values(game.players).forEach(player => player.answered = false);
   const currentQuestion = selectedQuizData[game.currentQuestionIndex];
   const questionToSend = { gameId: gameId, index: game.currentQuestionIndex, text: currentQuestion.question, options: currentQuestion.options, duration: 15, fullQuizData: game.currentQuestionIndex === 0 ? selectedQuizData : undefined };
 
-  console.log(`G:${gameId} Q:${game.currentQuestionIndex + 1} - Emitting showQuestion.`);
   io.to(gameId).emit("showQuestion", questionToSend);
-  console.log(`G:${gameId} Q:${game.currentQuestionIndex + 1} - Emitting updateGameState (status: question).`);
   io.to(gameId).emit("updateGameState", getSanitizedGameState(game));
 
-  const questionDuration = 15;
-  const timerDurationMs = questionDuration * 1000 + 500;
-  if (game.questionTimer) { console.log(`⏰ G:${gameId} Q:${game.currentQuestionIndex + 1} - Clearing existing timer ID: ${game.questionTimer} before setting new one.`); clearTimeout(game.questionTimer); }
-  console.log(`⏰ G:${gameId} Q:${game.currentQuestionIndex + 1} - Setting NEW server timer for ${timerDurationMs} ms.`);
+  const questionDuration = 15; const timerDurationMs = questionDuration * 1000 + 500;
+  if (game.questionTimer) { clearTimeout(game.questionTimer); }
   game.questionTimer = setTimeout(() => {
       const currentGameTimer = activeGames.get(gameId);
-      const timerIdWhenFired = game.questionTimer;
-      console.log(`*** Server Timer FIRED for G:${gameId}, Q:${game.currentQuestionIndex + 1} (Timer ID: ${timerIdWhenFired}) ***`);
       if (currentGameTimer && currentGameTimer.status === "question" && currentGameTimer.currentQuestionIndex === game.currentQuestionIndex) {
-          console.log(`   Timer Check Passed: Game exists, status is 'question', index matches.`);
-          console.log(`   Calling showResults from timer.`);
           showResults(gameId);
-      } else {
-          console.log(`   Timer Check FAILED: Game State Changed or Game Ended.`);
-          console.log(`   Current Game: ${!!currentGameTimer}, Status: ${currentGameTimer?.status}, Index: ${currentGameTimer?.currentQuestionIndex} (Expected Q Index: ${game.currentQuestionIndex})`);
-          console.log(`   Timer for Q:${game.currentQuestionIndex + 1} ignored as it's outdated or game state changed.`);
       }
   }, timerDurationMs);
-  console.log(`⏰ G:${gameId} Q:${game.currentQuestionIndex + 1} - New timer ID set: ${game.questionTimer}`);
 }
 
 function showResults(gameId) {
   const game = activeGames.get(gameId);
-  if (!game) { console.error(`showResults Error: Game ${gameId} not found.`); return; }
-  console.log(`>>> SERVER Check before calling showResults for G:${gameId}, Q:${game.currentQuestionIndex}, Status: ${game.status}`);
-
+  if (!game) { return; }
   if (game.status !== 'question') {
-      console.warn(`showResults for G:${gameId} aborted. Status is already '${game.status}'.`);
-      // Attempt to clear timer defensively if it still exists
-      if (game.questionTimer) { console.log(`   Clearing potentially redundant timer (${game.questionTimer}) in showResults guard.`); clearTimeout(game.questionTimer); game.questionTimer = null; }
+      if (game.questionTimer) { clearTimeout(game.questionTimer); game.questionTimer = null; }
       return;
   }
-
-  if (!game.selectedQuizId || !quizzes || !quizzes[game.selectedQuizId]) { console.error(`showResults Error: Invalid quiz state G:${gameId}`); return; }
+  if (!game.selectedQuizId || !quizzes || !quizzes[game.selectedQuizId]) { return; }
   const selectedQuizData = quizzes[game.selectedQuizId].data;
-  if (game.currentQuestionIndex < 0 || game.currentQuestionIndex >= selectedQuizData.length) { console.error(`showResults Error: Invalid Q index ${game.currentQuestionIndex} for G:${gameId}`); endGame(gameId); return; }
+  if (game.currentQuestionIndex < 0 || game.currentQuestionIndex >= selectedQuizData.length) { endGame(gameId); return; }
 
-  console.log(`✅ G:${gameId} Q:${game.currentQuestionIndex + 1} - Proceeding to show results.`);
   game.status = "results";
-  if (game.questionTimer) { console.log(`   Clearing timer (${game.questionTimer}) definitively within showResults.`); clearTimeout(game.questionTimer); game.questionTimer = null; }
-  else { console.log(`   No active timer found to clear within showResults (likely cleared by 'allAnswered').`); }
+  if (game.questionTimer) { clearTimeout(game.questionTimer); game.questionTimer = null; }
 
   const currentQuestion = selectedQuizData[game.currentQuestionIndex];
   const correctAnswerIndex = currentQuestion.correctAnswer;
@@ -384,19 +548,15 @@ function showResults(gameId) {
     if (isCorrect) { player.score += 100; }
     resultsData.scores[id] = { name: player.name, score: player.score, isCorrect: isCorrect, answered: player.answered, answer: submittedAnswer, };
   });
-
-  console.log(`G:${gameId} Q:${game.currentQuestionIndex + 1} - Emitting showResults event.`);
   io.to(gameId).emit("showResults", resultsData);
-  console.log(`G:${gameId} Q:${game.currentQuestionIndex + 1} - Emitting updateGameState (status: results).`);
   io.to(gameId).emit("updateGameState", getSanitizedGameState(game));
 }
 
 function endGame(gameId) {
   const game = activeGames.get(gameId);
-   if (!game) { console.warn(`endGame called for non-existent game ${gameId}.`); return; }
-   if (game.status === 'gameOver') { console.warn(`Game ${gameId} is already over.`); return; }
-  console.log(`G:${gameId} - Game Over.`);
-  game.status = "gameOver"; clearTimeout(game.questionTimer); game.questionTimer = null; // Clear timer
+   if (!game) { return; }
+   if (game.status === 'gameOver') { return; }
+  game.status = "gameOver"; clearTimeout(game.questionTimer); game.questionTimer = null;
   const finalScores = Object.values(game.players)
     .filter(player => player && typeof player.score === 'number')
     .sort((a, b) => b.score - a.score)
@@ -408,11 +568,10 @@ function endGame(gameId) {
 async function cleanupGame(gameId) {
   const game = activeGames.get(gameId);
   if (!game) return;
-  console.log(`Cleaning up game ${gameId}...`); clearTimeout(game.questionTimer); game.questionTimer = null; // Clear timer
+  clearTimeout(game.questionTimer); game.questionTimer = null;
   try {
     const socketsInRoom = await io.in(gameId).fetchSockets();
     socketsInRoom.forEach((s) => { s.leave(gameId); if (s.data.gameId === gameId) { s.data.gameId = null; } });
-     console.log(`Sockets removed from room ${gameId}`);
   } catch (error) { console.error(`Error fetching/leaving sockets for game ${gameId}:`, error); }
   activeGames.delete(gameId);
   console.log(`Game ${gameId} removed.`);
@@ -446,21 +605,27 @@ app.use((err, req, res, next) => {
     console.error("!!! Unhandled Server Error:", err.stack || err);
     if (!res.headersSent) { res.status(500).send('Internal Server Error!'); }
 });
+
 const port = process.env.PORT || 3000;
-server.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
-  console.log(`Allowed CORS origins: ${allowedOrigins.join(", ")}`);
-  const likelyUrl = allowedOrigins.find(url => url.includes('glitch.me')) || `http://localhost:${port}`;
-  console.log(`App should be available at: ${likelyUrl}`);
-  // Re-check quiz file access on startup
-  const quizFilePath = path.resolve(__dirname, 'quizzes.json');
-  fs.access(quizFilePath, fs.constants.R_OK, (err) => {
-    if (err) { console.error(`[Server Startup Check] FAILED to access quizzes.json at: ${quizFilePath}`); }
-    else { console.log(`[Server Startup Check] Successfully verified access to quizzes.json at: ${quizFilePath}`); }
-  });
-  // Check qrcode file access
-  fs.access(qrcodePath, fs.constants.R_OK, (err) => {
-    if (err) { console.error(`[Server Startup Check] FAILED to access qrcode.js at: ${qrcodePath}`); }
-    else { console.log(`[Server Startup Check] Successfully verified access to qrcode.js at: ${qrcodePath}`); }
-  });
-});
+
+async function startServer() {
+    console.log("[Server Startup] Starting server initialization...");
+    await connectDB();
+    console.log("[Server Startup] Database connection established. Loading initial quizzes...");
+    await loadQuizzes();
+    console.log("[Server Startup] Initial quizzes loaded. Starting HTTP server...");
+
+    server.listen(port, () => {
+        console.log(`[Server Startup] Server listening on port ${port}`);
+        console.log(`[Server Startup] Allowed CORS origins: ${allowedOrigins.join(", ")}`);
+        const likelyUrl = allowedOrigins.find(url => url.includes('glitch.me')) || `http://localhost:${port}`;
+        console.log(`[Server Startup] App should be available at: ${likelyUrl}`);
+        console.log(`[Server Startup] Serving static files from: ${path.join(__dirname, "public")}`);
+
+        fs.access(qrcodePath, fs.constants.R_OK, (err) => {
+           if (err) { console.error(`[Server Startup Check] FAILED to access qrcode.js at: ${qrcodePath}`); } 
+        });
+    });
+}
+
+startServer();

@@ -1,0 +1,300 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0; 
+    background-color: #f0f2f5; /* Lighter grey background */
+    color: #333;
+    font-size: 16px;
+}
+
+.editor-container {
+    max-width: 900px;
+    margin: 20px auto; 
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+}
+
+h1, h2 {
+    color: #2c3e50; 
+    text-align: center;
+    margin-bottom: 25px;
+}
+h1 {
+    font-size: 2.2em;
+    font-weight: 700;
+}
+h2 {
+    font-size: 1.8em;
+    font-weight: 500;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 10px;
+    margin-top: 30px;
+}
+
+
+.back-link-button {
+    display: inline-block;
+    padding: 10px 18px;
+    background-color: #3498db; /* Brighter blue */
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.back-link-button:hover {
+    background-color: #2980b9; /* Darker blue on hover */
+}
+
+
+/* Form Styling */
+#quiz-form label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500; 
+    color: #555;
+}
+
+#quiz-form input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 18px;
+    border: 1px solid #ced4da; 
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 1em;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+#quiz-form input[type="text"]:focus {
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+
+.question-block {
+    border: 1px solid #e9ecef;
+    padding: 20px;
+    margin-bottom: 25px;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+}
+
+.question-block h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #34495e;
+    font-size: 1.3em;
+}
+
+.options-group {
+    margin-top: 10px;
+}
+
+.option-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 5px;
+    border-radius: 4px;
+}
+.option-item:hover {
+    background-color: #e9ecef;
+}
+
+.option-item label {
+    min-width: 80px;
+    margin-right: 10px;
+    font-weight: normal;
+    color: #495057;
+}
+.option-item input[type="text"].option-input { 
+    flex-grow: 1;
+    margin-right: 10px;
+    margin-bottom: 0;
+}
+.option-item input[type="radio"].correct-answer-radio {
+    margin-left: 5px;
+    margin-right: 5px;
+    transform: scale(1.2);
+    cursor: pointer;
+}
+.option-item label.radio-label { 
+    font-weight: normal;
+    color: #495057;
+    cursor: pointer;
+    min-width: auto;
+}
+
+
+/* Buttons */
+button, .button-style {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 500;
+    margin-right: 10px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+button:hover, .button-style:hover {
+    transform: translateY(-1px);
+}
+button:active, .button-style:active {
+    transform: translateY(0px);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+button:disabled {
+    background-color: #adb5bd !important;
+    color: #6c757d !important;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+/* Primary Action Buttons */
+#add-question-btn, #save-quiz-btn, #refresh-quizzes-btn {
+    background-color: #28a745; /* Green for add/save */
+    color: white;
+}
+#add-question-btn:hover, #save-quiz-btn:hover, #refresh-quizzes-btn:hover {
+    background-color: #218838; /* Darker green */
+}
+
+.secondary-btn { /* For Clear Form */
+    background-color: #6c757d; /* Grey */
+    color: white;
+}
+.secondary-btn:hover {
+    background-color: #5a6268; /* Darker grey */
+}
+
+.remove-question-btn { 
+    background-color: #dc3545;
+    color: white;
+    font-size: 0.9em;
+    padding: 8px 12px;
+    margin-top: 10px;
+}
+.remove-question-btn:hover {
+    background-color: #c82333; /* Darker red */
+}
+.form-actions {
+    margin-top: 25px;
+    text-align: left;
+}
+
+
+/* Quiz List Styling */
+.quiz-list-section {
+    margin-top: 40px;
+}
+#quiz-list-controls {
+    margin-bottom: 15px;
+    text-align: right;
+}
+
+#quiz-list {
+    list-style: none;
+    padding: 0;
+}
+#quiz-list li {
+    background: #f8f9fa;
+    padding: 12px 18px;
+    border: 1px solid #dee2e6;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: box-shadow 0.2s ease;
+}
+#quiz-list li:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.quiz-name-list {
+    font-weight: 500;
+    color: #007bff; /* Blue for quiz names */
+    flex-grow: 1;
+}
+.quiz-details-list {
+    font-size: 0.9em;
+    color: #6c757d; /* Grey for details */
+    margin-left: 15px;
+    margin-right: 15px;
+}
+.quiz-actions-list .action-btn {
+    font-size: 0.9em;
+    padding: 6px 12px;
+    margin-left: 8px;
+}
+.quiz-actions-list .edit-btn {
+    background-color: #ffc107; /* Yellow for edit */
+    color: #212529;
+}
+.quiz-actions-list .edit-btn:hover {
+    background-color: #e0a800;
+}
+.quiz-actions-list .delete-btn {
+    background-color: #dc3545; /* Red for delete */
+    color: white;
+}
+.quiz-actions-list .delete-btn:hover {
+    background-color: #c82333;
+}
+
+
+/* Message Area */
+.message {
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    text-align: center;
+    font-weight: 500;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: opacity 0.3s ease, max-height 0.3s ease, padding 0.3s ease, margin-bottom 0.3s ease;
+}
+.message.visible {
+    opacity: 1;
+    max-height: 100px;
+}
+.message.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    padding: 12px 15px; 
+    margin-bottom: 20px;
+}
+.message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+}
+.message.info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+}
+
+/* Sections for layout */
+.quiz-form-section, .quiz-list-section {
+    margin-bottom: 30px;
+    padding: 25px;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+}

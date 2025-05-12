@@ -13,12 +13,15 @@
     <!-- Favicon -->
     <link rel="icon" href="https://cdn.glitch.global/9b03ef31-3692-4d55-a8ae-4315c13f33df/favicon4.png?v=1744606255144" type="image/png">
 
-    <!-- Link to External CSS -->
+    <!-- Link to CSS -->
     <link rel="stylesheet" href="style.css">
 
 </head>
 <body>
     <div id="main-container">
+        <div style="text-align: center; margin-bottom: 20px; padding-top: 10px;">
+            <a href="/quiz-editor" style="font-size: 1.2em; padding: 8px 15px; background-color: #6c757d; color: white; border-radius: 5px; text-decoration: none; border: 1px solid #5a6268;">Quiz Editor/Maker</a>
+        </div>
         <div id="status">Connecting...</div>
 
         <!-- Initial Screen -->
@@ -51,7 +54,7 @@
                      <label for="quiz-select">Choose a Quiz (Final Selection):</label>
                      <select id="quiz-select" required>
                         <option value="" disabled selected>-- Select Quiz --</option>
-                        <!-- Options populated dynamically -->
+                        <!-- Options get populated dynamically -->
                     </select>
                  </div>
                  <!-- Host Poll Results View -->
@@ -76,7 +79,7 @@
                  </div>
              </div>
 
-            <!-- Player List (Visible to All) -->
+            <!-- Player List -->
             <div id="player-list">
                 <h3>Players Joined:</h3>
                 <ul><!-- Player list updated dynamically --></ul>
@@ -126,7 +129,7 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="/qrcode.js"></script>
 
-    <!-- Link to External Game Logic Script -->
+    <!-- Link to Game Logic Script -->
     <script src="gameLogic.js"></script>
 </body>
 </html>

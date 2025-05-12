@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Editor - Cahoot Klone</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="quiz-editor.css">
+    <link rel="icon" href="https://cdn.glitch.global/9b03ef31-3692-4d55-a8ae-4315c13f33df/favicon4.png?v=1744606255144" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="editor-container">
+        <h1>Quiz Editor</h1>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <a href="/" class="back-link-button">Back to Game Lobby</a>
+        </div>
+
+
+        <div id="message-area" class="message"></div>
+
+        <div class="quiz-form-section">
+            <h2>Create / Edit Quiz</h2>
+            <form id="quiz-form">
+                <input type="hidden" id="quiz-id" value="">
+
+                <div>
+                    <label for="quiz-name">Quiz Name:</label>
+                    <input type="text" id="quiz-name" required>
+                </div>
+
+                <div id="questions-container">
+                    <!-- Questions will be added here by JS -->
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" id="add-question-btn">Add Question</button>
+                    <button type="submit" id="save-quiz-btn">Save Quiz</button>
+                    <button type="button" id="clear-form-btn" class="secondary-btn">Clear Form / New Quiz</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="quiz-list-section">
+            <h2>Existing Quizzes</h2>
+            <div id="quiz-list-controls">
+                <button type="button" id="refresh-quizzes-btn">Refresh List</button>
+            </div>
+            <ul id="quiz-list">
+                <li>Loading quizzes...</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="quiz-editor.js"></script>
+</body>
+</html>
